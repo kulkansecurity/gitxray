@@ -11,6 +11,9 @@ authors = [
 description = "A multifaceted security tool which leverages Public GitHub REST APIs for OSINT, Forensics, Pentesting and more."
 readme = "README.md"
 requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.32.3",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU Affero General Public License v3",
@@ -25,6 +28,3 @@ Issues = "https://github.com/kulkansecurity/gitxray/issues"
 
 [project.scripts]
 gitxray = "gitxray.gitxray:gitxray_cli"
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
