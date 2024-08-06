@@ -12,13 +12,22 @@ Available at: https://www.gitxray.com/
 
 # Installing and running Gitxray
 
+gitxray was written with no use of external package dependencies other than the `requests` library.
+
+## PyPI (PIP) Way
+
 `gitxray` is on PyPI and can be installed with:
 
 ```bash
 pip install gitxray
 ```
 
-It was written with no use of external dependencies other than the `requests` library.
+Once installed, simply run gitxray from your command line by typing:
+```bash
+gitxray -h
+```
+
+## Installing from source
 
 You may also run `gitxray` directly by cloning or downloading its GitHub repository and running.
 
