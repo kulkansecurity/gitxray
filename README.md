@@ -19,6 +19,8 @@ It was written with no use of external dependencies other than the `requests` li
 You may also run `gitxray` directly by cloning or downloading its GitHub repository and running.
 
 ```bash
+python3 -m pip install -r requirements.txt
+cd src/
 python3 -m gitxray.gitxray
 ```
 
