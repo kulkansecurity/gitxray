@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitxray"
+version = "1.0.9"
+authors = [
+  { name="Lucas Lavarello", email="llavarello@kulkan.com" },
+]
+description = "A multifaceted security tool which leverages Public GitHub REST APIs for OSINT, Forensics, Pentesting and more."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Topic :: Security",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/kulkansecurity/gitxray"
+Issues = "https://github.com/kulkansecurity/gitxray/issues"
+
+[project.scripts]
+gitxray = "gitxray.gitxray:gitxray_cli"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
