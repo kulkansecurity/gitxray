@@ -20,9 +20,6 @@ class Context:
     def verboseEnabled(self):
         return self._cmd_args.verbose
 
-    def verboseEnabled(self):
-        return self._cmd_args.verbose
-
     def listAndQuit(self):
         return self._cmd_args.list
 
