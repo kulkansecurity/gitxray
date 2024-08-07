@@ -19,7 +19,7 @@ def gitxray_cli():
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
 gitxray: X-Ray and analyze Github Repositories and their Contributors. Trust no one!
-v1.0.10 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+v1.0.11 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
@@ -35,6 +35,9 @@ v1.0.10 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by
         gx_output.warn("Without setting a GitHub token you may only be able to scan small repositories uninterruptedly.")
     else:
         gx_output.notify(f"GitHub Token loaded from {gx_definitions.ENV_GITHUB_TOKEN} env variable.")
+
+    if not gx_context.verboseEnabled():
+        gx_output.notify(f"Verbose mode is DISABLED. You might want to use -v if you're hungry for information.")
 
     if gx_context.getOutputFilters():
         gx_output.notify(f"You have ENABLED filters - You will only see results containing the following keywords: {str(gx_context.getOutputFilters())}")
@@ -55,37 +58,42 @@ v1.0.10 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by
                 print(org_repos)
             sys.exit()
 
-    for repo in gx_context.getRepositoryTargets():
-        r_started_at = datetime.datetime.now()
-        try:
-            repository = gh_api.fetch_repository(repo)
-            gx_output.r_log(f"X-Ray on repository started at: {r_started_at}", repository=repository.get('full_name'), rtype="metrics")
-            print("#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
-            print("Now verifying repository: {}".format(repository.get('full_name')))
-        except Exception as ex:
-            print("Unable to pull data for the repository that was provided. Is it a valid repo URL?")
-            if gx_context.debugEnabled():
-                print(ex)
-            sys.exit()
+    try:
+        for repo in gx_context.getRepositoryTargets():
+            r_started_at = datetime.datetime.now()
+            try:
+                repository = gh_api.fetch_repository(repo)
+                gx_output.r_log(f"X-Ray on repository started at: {r_started_at}", repository=repository.get('full_name'), rtype="metrics")
+                print("#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
+                print("Now verifying repository: {}".format(repository.get('full_name')))
+            except Exception as ex:
+                print("Unable to pull data for the repository that was provided. Is it a valid repo URL?")
+                if gx_context.debugEnabled():
+                    print(ex)
+                sys.exit()
 
-        # Let's keep track of the repository that we're X-Raying
-        gx_context.setRepository(repository)
+            # Let's keep track of the repository that we're X-Raying
+            gx_context.setRepository(repository)
 
-        # Now call our xray modules! Specifically by name, until we make this more plug and play
-        # The standard is that a return value of False leads to skipping additional modules
+            # Now call our xray modules! Specifically by name, until we make this more plug and play
+            # The standard is that a return value of False leads to skipping additional modules
 
-        if not contributors_xray.run(gx_context, gx_output): continue
-        if not repository_xray.run(gx_context, gx_output): continue
+            if not contributors_xray.run(gx_context, gx_output): continue
+            if not repository_xray.run(gx_context, gx_output): continue
 
-        # Now that we're done, let's cross reference everything in the repository.
-        association_xray.run(gx_context, gx_output)
+            # Now that we're done, let's cross reference everything in the repository.
+            association_xray.run(gx_context, gx_output)
 
-        r_ended_at = datetime.datetime.now()
-        gx_output.r_log(f"X-Ray on repository ended at: {r_ended_at} - {((r_ended_at-r_started_at).seconds/60):.2f} minutes elapsed", rtype="metrics")
+            r_ended_at = datetime.datetime.now()
+            gx_output.r_log(f"X-Ray on repository ended at: {r_ended_at} - {((r_ended_at-r_started_at).seconds/60):.2f} minutes elapsed", rtype="metrics")
+            gx_output.doOutput()
+
+            # We're resetting our context on every new repo; eventually we'll maintain a context per Org.
+            gx_context.reset() 
+
+    except KeyboardInterrupt:
+        gx_output.warn("\r\nReceived CTRL+C - Interrupting execution and printing all results obtained this far.")
         gx_output.doOutput()
-
-        # We're resetting our context on every new repo; eventually we'll maintain a context per Org.
-        gx_context.reset() 
 
 if __name__ == "__main__":
     gitxray_cli()
