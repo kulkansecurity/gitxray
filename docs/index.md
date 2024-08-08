@@ -4,11 +4,11 @@
 
 Gitxray (short for Git X-Ray) is a multifaceted security tool designed for use on GitHub repositories. It can serve many purposes, including OSINT and Forensics. `gitxray` leverages public GitHub REST APIs to gather information that would otherwise be very time-consuming to obtain manually. Additionally, it seeks out information in unconventional places.
 
-## Getting started with `gitxray`
-
 * [Installing Gitxray](installing.md)
 * [Awesome Features](awesome_features.md) &#128171;
 * [More Features](more_features.md) &#129470;
+
+<p>&nbsp;</p>
 
 ## Rate Limits and the GitHub API
 
