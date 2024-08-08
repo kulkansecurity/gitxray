@@ -1,4 +1,4 @@
-# Ideas pending to be implemented
+# Pending Work
 
 * Use repository stats, eg the punch_card endpoint to identify commits made at a time of day which break patterns
 * SSH Public Keys: Improve BLOB parsing and collect Key strength bits which could be used to link to other User keys.

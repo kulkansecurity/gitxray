@@ -6,24 +6,19 @@ theme:
   language: en
   features:
     - navigation.expand
+    - content.code.copy
 
 nav:
-  - 'index.md'
   - 'installing.md'
-  - 'osint_pentest.md'
-  - 'forensics_spotting.md'
-  - 'securing_repos.md'
-  - 'ideas_pending.md'
-  - 'code_structure.md'
-  - 'show_love.md'
+  - 'awesome_features.md'
+  - 'more_features.md'
+  - 'pending_work.md'
 
 markdown_extensions:
   - toc:
       permalink: 
   - attr_list
   - md_in_html
-  - pymdownx.arithmatex:
-      generic: true
 
 copyright: |
-  Made with &hearts; by <a href="https://www.kulkan.com" target="_blank" rel="noopener">Kulkan Security</a>
+  Made with &hearts; by <a href="https://www.kulkan.com" target="_blank">Kulkan Security</a> - your favorite <a href="https://www.kulkan.com" target="_blank">Penetration Testing Partner</a>.
