@@ -1,24 +1,26 @@
 # Welcome to Gitxray
 
-<div style="float: left; margin-right: 10px;">
-	<img src="https://kulkansecurity.github.io/gitxray/images/logo_gitxray.png" alt="gitxray logo" width="300"/>
+<div style="overflow: hidden;">
+    <div style="float: left; margin-right: 10px;">
+        <img src="https://kulkansecurity.github.io/gitxray/images/logo_gitxray.png" alt="gitxray logo" width="300"/>
+    </div>
+    <div style="float: left;">
+        <img src="https://kulkansecurity.github.io/gitxray/images/console_gitxray.png" alt="gitxray console" width="300" />
+    </div>
 </div>
+<div style="clear: both;"></div>
+
 <p>Gitxray (short for Git X-Ray) is a multifaceted security tool designed for use on GitHub repositories. It can serve many purposes, including OSINT and Forensics. `gitxray` leverages public GitHub REST APIs to gather information that would otherwise be very time-consuming to obtain manually. Additionally, it seeks out information in unconventional places. </p>
-<p>&nbsp;</p>
 
 [![Build Workflows](https://github.com/kulkansecurity/gitxray/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kulkansecurity/gitxray)
 [![Latest Version in PIP](https://img.shields.io/pypi/v/gitxray.svg)](https://pypi.org/project/gitxray)
 [![Python Versions](https://img.shields.io/pypi/pyversions/gitxray.svg)](https://pypi.org/project/gitxray)
 [![License](https://img.shields.io/pypi/l/gitxray.svg)](https://github.com/kulkansecurity/gitxray/blob/main/LICENSE)
 
-<br/>
 # Use-cases and documentation
 - [https://kulkansecurity.github.io/gitxray/](https://kulkansecurity.github.io/gitxray/)
 - [https://www.gitxray.com/](https://www.gitxray.com/)
 
-<p align="center">
-  <img src="https://kulkansecurity.github.io/gitxray/images/console_gitxray.png" alt="gitxray console" width="700" />
-</p>
 
 # Installing and running Gitxray
 
