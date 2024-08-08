@@ -1,4 +1,4 @@
-# Installing and running Gitxray
+# Installing Gitxray
 
 gitxray was written with no use of external package dependencies other than the `requests` library.
 
@@ -12,7 +12,11 @@ pip install gitxray
 
 Once installed, simply run gitxray from your command line by typing:
 ```bash
-gitxray -h
+gitxray -o https://github.com/SampleOrg
+```
+or
+```bash
+gitxray -r https://github.com/SampleOrg/SampleRepo
 ```
 
 ## Installing from source
@@ -57,18 +61,3 @@ You'll find these optional but very handy in common gitxray usage.
 - `-out, --outfile [FILEPATH]` - Specify the file path for the output log. Cannot be a directory. **Example**: `--outfile ./output.log`
 
 - `-outformat, --output-format [FORMAT]` - Set the format for the log file. Supported formats are `text` and `json`. Default is `text`. **Example**: `--output-format json`
-
-### Usage Examples
-Refer to [Use cases](index.md#use-cases-when-using-gitxray) for combinations of commands aligned with specific use-cases.
-
-``` bash
-# Analyze a single repository with verbose output
-gitxray --repository https://github.com/example/repo --verbose
-
-# List all repository names under a given Organization
-gitxray --organization https://github.com/exampleOrg --list
-
-# Analyze all repositories under an Organization with filters capturing user_input and associations
-gitxray -org https://github.com/exampleOrg -f user_input,association
-```
-
