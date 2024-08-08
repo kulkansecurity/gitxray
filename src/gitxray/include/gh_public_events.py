@@ -99,7 +99,7 @@ def log_events(events, gx_output, for_repository=False):
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#watchevent
         elif etype == "WatchEvent":
-            logging_func(f"{ts}: {actor}{action} watching a repository: [{event.get('repo').get('name')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} starred a repository: [{event.get('repo').get('name')}]", rtype="v_90d_events")
         else:
             logging_func(f"Missing parser in recent events for: {etype} with {payload}", rtype="debug")
 
@@ -112,9 +112,9 @@ def log_events(events, gx_output, for_repository=False):
         summary_message = f"In {month}, "
         if etype == "WatchEvent":
             if for_repository:
-                summary_message += f"{count} users started watching the repository."
+                summary_message += f"{count} users starred the repository."
             else:
-                summary_message += f"the user started watching {count} repositories."
+                summary_message += f"the user starred {count} repositories."
         elif etype == "ForkEvent":
             if for_repository:
                 summary_message += f"the repository was forked {count} times."
