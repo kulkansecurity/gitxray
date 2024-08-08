@@ -363,7 +363,7 @@ def run(gx_context, gx_output):
     commits_url = f"Find commits with: https://api.github.com/search/commits?q=repo:{repository.get('full_name')}+author-email:PLACE_EMAIL_HERE"
     gx_output.a_log(commits_url, anonymous="#", rtype="urls")
     for k,v in unique_anonymous.items():
-        gx_output.a_log(str(v), anonymous="#", rtype=k)
+        gx_output.a_log(f'{k} - {v}', anonymous="#", rtype="anonymous")
 
     print('\rContributors have been analyzed..'+' '*60, flush=True)
 
