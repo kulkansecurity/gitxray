@@ -114,6 +114,7 @@ def ugly_inhouse_openpgp_block(pgp_armored_input):
 
     # format the data a bit by removing unwanted strings and chars, also consider a potential Version
     base64_str = re.sub(r'-----BEGIN PGP SIGNATURE-----|-----BEGIN PGP PUBLIC KEY BLOCK-----', '', pgp_armored_input)
+    base64_str = re.sub(r'Charset: (.+)\r?\n?', '', base64_str)
     base64_str = re.sub(r'Version: (.+)\r?\n?', '', base64_str)
     base64_str = re.sub(r'Comment: (.+)\r?\n?', '', base64_str)
     base64_str = re.sub(r'-----END PGP SIGNATURE-----|-----END PGP PUBLIC KEY BLOCK-----', '', base64_str)
