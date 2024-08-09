@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.gitxray.com/more_features/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>More Features &#129470; - Gitxray</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "More Features \u0026#129470;";
+        var mkdocs_page_input_path = "more_features.md";
+        var mkdocs_page_url = "/more_features/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Gitxray
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installing/">Installing Gitxray</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../awesome_features/">Awesome Features &#128171;</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">More Features &#129470;</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#lots-of-e-mail-addresses-and-profiling-data">Lots of e-mail addresses &#128231; and Profiling data &#128100;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#looking-out-for-malicious-releases-and-assets">Looking out for malicious Releases and Assets &#128065;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#anonymous-contributors">Anonymous contributors &#128065;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#and-so-much-more">And so much more.</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../pending_work/">Pending Work</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Gitxray</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">More Features &#129470;</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/kulkansecurity/gitxray/edit/master/docs/more_features.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="more-features">More Features &#129470;<a class="headerlink" href="#more-features" title="Permanent link"></a></h1>
+<p>There's awesome and then there's <em>good</em> features. </p>
+<h2 id="lots-of-e-mail-addresses-and-profiling-data">Lots of e-mail addresses &#128231; and Profiling data &#128100;<a class="headerlink" href="#lots-of-e-mail-addresses-and-profiling-data" title="Permanent link"></a></h2>
+<p><code>gitxray</code> will report for each Contributor, an <code>emails</code> category listing all unique e-mail address collected from parsing:</p>
+<ul>
+<li>The User's profile</li>
+<li>Each commit made by the User</li>
+<li>PGP Primary Keys and PGP SubKeys</li>
+</ul>
+<p>Additionally, Personal Information (e.g. social networks) voluntarily made Public by the User is extracted from multiple sources including PGP Key BLOBs and reported under a <code>personal</code> category.</p>
+<p>Finally, the <code>profiling</code> category tends to display information related to the account itself (e.g. creation date, last updated, and more.)</p>
+<p>You may focus specifically on <code>emails</code>, <code>personal</code>, and <code>profiling</code> fields with (Verbose is optional):</p>
+<pre><code class="language-py">gitxray -o https://github.com/SampleOrg -v -f emails,personal,profiling
+</code></pre>
+<p>or, for a specific repository, with: </p>
+<pre><code class="language-py">gitxray -r https://github.com/SampleOrg/SampleRepo -v -f emails,personal,profiling
+</code></pre>
+<h2 id="looking-out-for-malicious-releases-and-assets">Looking out for malicious Releases and Assets &#128065;<a class="headerlink" href="#looking-out-for-malicious-releases-and-assets" title="Permanent link"></a></h2>
+<p>It is possible for Threat Actors to compromise credentials of a Repository Maintainer in order to deploy malware by silently updating released Assets (the typical package you would download when a Release includes downloadable Assets); which is why <code>gitxray</code> looks at all Repository Releases and informs of:</p>
+<ul>
+<li>
+<p>Assets that were <strong>updated</strong> at least a day <strong>AFTER</strong> their release, which might lead to suggest they've been infected and/or tampered with. Or it could just be a maintainer fixing an asset without wanting to create a new release.</p>
+</li>
+<li>
+<p>Users who have historically created releases and/or uploaded assets, as well as the % vs. the total amount of releases or assets uploaded in the repository; which may allow you to flag potential suspicious activity. For example, you might notice an account which never created Releases before now uploading assets.</p>
+</li>
+</ul>
+<p>All of this information is included by <code>gitxray</code> in a <code>releases</code> category, which means you can focus on those results (if any exist) with:</p>
+<pre><code class="language-bash">gitxray -o https://github.com/SampleOrg -f releases
+</code></pre>
+<h2 id="anonymous-contributors">Anonymous contributors &#128065;<a class="headerlink" href="#anonymous-contributors" title="Permanent link"></a></h2>
+<p>As stated in <a href="https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-contributors">GitHub documentation</a>, only the first 500 author email addresses in a Repository will link to actual GitHub users or accounts. The rest will appear as "anonymous" contributors without associated GitHub information.</p>
+<p>Additionally, when an author's email address in a commit is not associated with a GitHub account, the User will also be considered Anonymous.</p>
+<p>Lucky for us, <code>gitxray</code> also includes within its output the entire list of Anonymous contributors received from GitHub. The list is first processed to combine all variations of Names used by the author for a same e-mail, which means the list can also be pretty useful when, for example, executing OSINT.</p>
+<p>To filter for anonymous contributors, you may use:</p>
+<pre><code class="language-bash">gitxray -o https://github.com/SampleOrg -f anonymous
+</code></pre>
+<h2 id="and-so-much-more">And so much more.<a class="headerlink" href="#and-so-much-more" title="Permanent link"></a></h2>
+<p>We've covered a large amount of use-cases for <code>gitxray</code>, yet we're nowhere finished. Start X-Raying today your favorite Organizations and Repositories and discover more ways of connecting dots. We've outlined a series of Ideas we are working on under the <a href="../pending_work/">Pending Work</a> section.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../awesome_features/" class="btn btn-neutral float-left" title="Awesome Features &#128171;"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../pending_work/" class="btn btn-neutral float-right" title="Pending Work">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Made with &hearts; by <a href="https://www.kulkan.com" target="_blank">Kulkan Security</a> - your favorite <a href="https://www.kulkan.com" target="_blank">Penetration Testing Partner</a>.
+</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/kulkansecurity/gitxray" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../awesome_features/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../pending_work/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
