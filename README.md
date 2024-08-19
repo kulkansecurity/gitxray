@@ -6,7 +6,16 @@ The Octocat getting X-Rayed  | [![Build Workflows](https://github.com/kulkansecu
 ![Gitxray Logo](https://kulkansecurity.github.io/gitxray/images/logo_gitxray.png "Gitxray Logo") | ![Gitxray Console](https://kulkansecurity.github.io/gitxray/images/console_gitxray.png "Gitxray Console")
 <div style="clear: both;"></div>
 
-# Use-cases and documentation
+# Use cases
+Gitxray can be used to, for example:
+- Find sensitive information in contributor profiles disclosed by accident within, for example, Armored PGP Keys, or Key Names.
+- Identify threat actors in a Repository. You may spot co-owned or shared accounts, as well as inspect public events to spot fake Stargazers.
+- Identify fake or infected Repositories. It can detect tampered commit dates as well as, for example, Release assets updated post-release.
+- And a lot more!
+
+Please refer to the Documentation for additional use-cases and introductory information.
+
+# Documentation
 - [https://kulkansecurity.github.io/gitxray/](https://kulkansecurity.github.io/gitxray/)
 - [https://www.gitxray.com/](https://www.gitxray.com/)
 
@@ -25,6 +34,11 @@ pip install gitxray
 Once installed, simply run gitxray from your command line by typing:
 ```bash
 gitxray -h
+```
+
+## Run your first full X-Ray
+```bash
+gitxray -o https://github.com/kulkansecurity -v
 ```
 
 ## Installing from source
