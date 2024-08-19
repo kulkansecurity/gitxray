@@ -129,14 +129,26 @@ def fetch_repository_public_events(repo):
 def fetch_repository_actions_workflows(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/workflows")
 
+def fetch_repository_actions_artifacts(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/artifacts")
+
 def fetch_repository_releases(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/releases")
+
+def fetch_repository_tags(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/tags")
+
+def fetch_repository_branches(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/branches")
 
 def fetch_repository_contributors(repo):
     return github_request_json(repo.get('contributors_url'), {'anon':1})
 
 def fetch_repository_deployments(repo):
     return github_request_json(repo.get('deployments_url'))
+
+def fetch_repository_environments(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/environments")
 
 def fetch_repository_pull_requests(repo):
     return github_request_json(repo.get('pulls_url').replace("{/number}",""), {'state':'all'})
