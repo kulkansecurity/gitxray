@@ -11,7 +11,7 @@ def run(gx_context, gx_output):
         msg = None
 
         if colType == "PGP_KEYID" and (colValue not in gx_definitions.GITHUB_WEB_EDITOR_SIGNING_KEYS):
-                msg = f"A Personal/Private PGP Key with ID {colValue} found shared by accounts: {affected_accounts}."
+                msg = f"WARNING: A Personal/Private PGP Key with ID {colValue} found shared by accounts: {affected_accounts}."
         elif colType == "PGP_SCT":
             msg = f"PGP Signature Creation Time ({colValue}) shared by accounts: {affected_accounts}."
         elif colType == "PGP_SUBKEY_CREATED_AT":
