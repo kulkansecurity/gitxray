@@ -18,24 +18,87 @@ def run(gx_context, gx_output):
     if repository.get('homepage'):
         gx_output.r_log(f"Homepage: [{repository.get('homepage')}]", rtype="urls")
 
-    print(f"Checking for repository deployments..")
+    print(f"Checking for repository deployments..", end="")
     if repository.get('deployments_url'):
          deployments = gh_api.fetch_repository_deployments(repository)
-         if len(deployments) > 0: gx_output.r_log(f"Deployments available at: [{repository.get('html_url')}/deployments]", rtype="urls")
+         if len(deployments) > 0: gx_output.r_log(f"{len(deployments)} Deployments available at: [{repository.get('html_url')}/deployments]", rtype="urls")
 
+    print(f"\rChecking for repository environments.."+" "*30, end="")
+    environments = gh_api.fetch_repository_environments(repository)
+    if environments != None and environments.get('total_count') > 0:
+        gx_output.r_log(f"{environments.get('total_count')} Environments available at: [{repository.get('url')}/environments]", rtype="urls")
+        for environment in environments.get('environments'):
+            gx_output.r_log(f"Environment [{environment.get('name')}] created [{environment.get('created_at')}], updated [{environment.get('updated_at')}]: {environment.get('html_url')}", rtype="environments")
+
+    print(f"\rChecking for repository forks.."+" "*30, end="")
     if repository.get('forks_count') > 0:
         gx_output.r_log(f"Repository has {repository.get('forks_count')} forks: {repository.get('forks_url')}", rtype="profiling")
 
-    print(f"Querying about repository action workflows..")
+    print(f"\rQuerying for repository action workflows.."+" "*30, end="")
     workflows = gh_api.fetch_repository_actions_workflows(repository)
     if workflows != None and workflows.get('total_count') > 0:
+        gx_output.r_log(f"{workflows.get('total_count')} Workflows available at: [{repository.get('url')}/actions/workflows]", rtype="urls")
         for workflow in workflows.get('workflows'):
-            gx_output.r_log(f"Repository has a GitHub Action workflow at {workflow.get('html_url')}", rtype="workflows")
+            gx_output.r_log(f"Workflow [{workflow.get('name')}] created [{workflow.get('created_at')}], updated [{workflow.get('updated_at')}]: {workflow.get('html_url')}", rtype="workflows")
+
+    print(f"\rQuerying for repository action artifacts.."+" "*30, end="")
+    artifacts = gh_api.fetch_repository_actions_artifacts(repository)
+    if artifacts != None and artifacts.get('total_count') > 0:
+        gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="urls")
+        for artifact in artifacts.get('artifacts'):
+            # There are normally multiple artifacts hence we keep them under verbose.
+            gx_output.r_log(f"Artifact [{artifact.get('name')}] created [{artifact.get('created_at')}], updated [{artifact.get('updated_at')}]: {artifact.get('url')}", rtype="v_artifacts")
+            created_at = artifact.get('created_at')
+            created_at_ts = gh_time.parse_date(created_at)
+            updated_at = artifact.get('updated_at')
+            updated_at_ts = gh_time.parse_date(updated_at)
+            # This shouldn't happen but we still run a check; artifacts can't be updated but instead completely overwritten
+            # More data here: https://github.com/actions/upload-artifact#overwriting-an-artifact
+            if (updated_at_ts-created_at_ts).days > 0:
+                gx_output.r_log(f"An artifact [{artifact.get('name')}] was updated {(updated_at_ts-created_at_ts).days} days after being created: {artifact.get('url')}", rtype="artifacts")
+
+    print(f"\rInspecting repository branches.."+" "*40, end="")
+    branches = gh_api.fetch_repository_branches(repository)
+    if len(branches) > 0: 
+        gx_output.r_log(f"{len(branches)} Branches available at: [{repository.get('html_url')}/branches]", rtype="urls")
+        unprotected_branches = []
+        protected_branches = []
+        for branch in branches:
+            if branch.get('protected') == False:
+                unprotected_branches.append(branch.get('name'))
+            else:
+                protected_branches.append(branch.get('name'))
+
+        if len(unprotected_branches) > 0: gx_output.r_log(f"{len(unprotected_branches)} Unprotected Branches: {unprotected_branches}", rtype="branches")
+        if len(protected_branches) > 0: gx_output.r_log(f"{len(protected_branches)} Protected Branches: {protected_branches}", rtype="branches")
+
+    print(f"\rInspecting repository tags.."+" "*40, end="")
+    tags = gh_api.fetch_repository_tags(repository)
+    if len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="urls")
+    tag_taggers = defaultdict(int)
+
+    """ A bit shameful here because we can't really get too much data out of tags because of the way the GH API is implemented.
+    It only returns stripped tags when getting all tags, we can't even get who the tagger was. """
+    for tag in tags:
+        tagger = tag.get('tagger')
+        if tagger == None:
+            # Lightweight tags - for some reason GitHub's API is returning stripped down version of tags even if they are not lightweight
+            gx_output.r_log(f"Tag [{tag.get('name')}] is available at: [{repository.get('html_url')}/tags]", rtype="v_tags")
+        else: 
+            tagger = tagger.get('email')
+            tag_taggers[tagger] += 1
+            gx_output.r_log(f"A tag was created by {tagger} at {tag.get('tagger').get('date')}: {tag.get('url')}", rtype="v_tags")
+
+    total_tags = sum(tag_taggers.values())
+    for tagger, tags in tag_taggers.items():
+        percentage_tags = (tags / total_tags) * 100
+        message = f"{tagger} created historically {tags} tags [{percentage_tags:.2f}%]"
+        gx_output.r_log(message, rtype="tags")
 
 
-    print(f"Inspecting repository releases..")
+    print(f"\rInspecting repository releases.."+" "*40, end="")
     releases = gh_api.fetch_repository_releases(repository)
-    if len(releases) > 0: gx_output.r_log(f"Releases available at: [{repository.get('html_url')}/releases]", rtype="urls")
+    if len(releases) > 0: gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="urls")
 
     release_authors = defaultdict(int)
     asset_uploaders = defaultdict(int)
@@ -50,12 +113,14 @@ def run(gx_context, gx_output):
                 uploaded_by = asset.get('uploader').get('login')
                 asset_uploaders[uploaded_by] += 1
                 created_at = asset.get('created_at')
-                gx_output.r_log(f"An asset was uploaded by {uploaded_by} at {created_at}: {asset.get('url')}", rtype="v_releases")
+                message = f"An asset was uploaded by {uploaded_by} at {created_at}: {asset.get('url')}"
+                gx_output.r_log(message, rtype="v_releases")
+                gx_output.c_log(message, rtype="v_releases", contributor=uploaded_by)
                 created_at_ts = gh_time.parse_date(created_at)
                 updated_at = asset.get('updated_at')
                 updated_at_ts = gh_time.parse_date(updated_at)
                 if (updated_at_ts-created_at_ts).days > 0:
-                    gx_output.r_log(f"An asset in Release [{release.get('name')}] by [{uploaded_by}] was updated {(updated_at_ts-created_at_ts).days} days after its release: {asset.get('url')}", rtype="releases")
+                    gx_output.r_log(f"WARNING: An asset in Release [{release.get('name')}] by [{uploaded_by}] was updated {(updated_at_ts-created_at_ts).days} days after its release: {asset.get('url')}", rtype="releases")
 
     total_releases = sum(release_authors.values())
     total_assets = sum(asset_uploaders.values())
@@ -73,13 +138,19 @@ def run(gx_context, gx_output):
         else:
             message += " and never uploaded assets."
 
+        if gx_context.verboseEnabled() == False: message += " Turn on Verbose mode for more information."
+
         gx_output.r_log(message, rtype="releases")
+        gx_output.c_log(message, rtype="releases", contributor=author)
 
     # Handle asset uploaders who did not create any releases
     for uploader in asset_uploaders_set:
         assets = asset_uploaders[uploader]
         percentage_assets = (assets / total_assets) * 100
-        gx_output.r_log(f"User {uploader} has uploaded {assets} assets [{percentage_assets:.2f}%] and never created a release, Warning.", rtype="releases")
+        message = f"WARNING: User {uploader} has uploaded {assets} assets [{percentage_assets:.2f}%] and never created a release."
+        if gx_context.verboseEnabled() == False: message += " Turn on Verbose mode for more information."
+        gx_output.r_log(message, rtype="releases")
+        gx_output.c_log(message, rtype="releases", contributor=uploader)
 
         """ Work in Progress: This sounded fun but ended up being a dead end.
         # Let's run an additional check on stargazers if, and only if, the repository has up to 5000 gazers.
@@ -123,7 +194,10 @@ def run(gx_context, gx_output):
         """
 
     if repository.get('watchers_count') > 0:
-        gx_output.r_log(f"Repository is being Watched by {repository.get('subscribers_count')} Subscribers: {repository.get('subscribers_url')}", rtype="profiling")
+        gx_output.r_log(f"Watchers count: [{repository.get('subscribers_count')}] List at: {repository.get('subscribers_url')}", rtype="profiling")
+
+    if repository.get('stargazers_count') > 0:
+        gx_output.r_log(f"Stars count: [{repository.get('stargazers_count')}] List at: {repository.get('stargazers_url')}", rtype="profiling")
 
     if repository.get('open_issues_count') > 0:
         gx_output.r_log(f"Repository has {repository.get('open_issues_count')} Open Issues: {repository.get('html_url')}/issues", rtype="profiling")
@@ -243,6 +317,11 @@ def run(gx_context, gx_output):
         if details['open'] > 0:
             gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['open']} remain open.", rtype="profiling", contributor=user)
 
+    # Check if there were any users with mismatches in commits dates in the repository.
+    for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS").items():
+            gx_output.r_log(f"WARNING: UNRELIABLE DATES in {dates_mismatch_commits} commits by Contributor [{user}]. The account is newer than the commit! Unreliable historic activity or account re-use.", rtype="commits")
+       
+
     """ This here next is Work in Progress - trying to figure out what to pay attention to here that makes sense.
     # Get all Issues. Note from GitHub that Issues returns both Issues + PRs:
     # https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28
@@ -261,4 +340,5 @@ def run(gx_context, gx_output):
     gx_output.r_log(f"The repository has no record of Issues or Pull Requests.", rtype="profiling")
     """
 
+    print(f"\rRepository has been analyzed.." + " "*40)
     return True
