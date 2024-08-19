@@ -90,14 +90,15 @@ def run(gx_context, gx_output):
             gx_output.c_log(f"[{contributor.get('email')}] obtained from the user's profile", rtype="emails")
             gx_context.linkIdentifier("EMAIL", [contributor.get('email')], contributor_login)
 
-        days_since_creation = (datetime.now(timezone.utc) - gh_time.parse_date(contributor.get('created_at'))).days 
+        contributor_created_at_time = gh_time.parse_date(contributor.get('created_at'))
+        days_since_account_creation = (datetime.now(timezone.utc) - contributor_created_at_time).days 
 
         # Let's keep track of when the accounts were created.
-        gx_context.linkIdentifier("DAYS_SINCE_CREATION", [days_since_creation], contributor_login)
+        gx_context.linkIdentifier("DAYS_SINCE_CREATION", [days_since_account_creation], contributor_login)
 
-        message = f"{days_since_creation} days old"
-        if days_since_creation > 365:
-            years = "{:.2f}".format(days_since_creation / 365)
+        message = f"{days_since_account_creation} days old"
+        if days_since_account_creation > 365:
+            years = "{:.2f}".format(days_since_account_creation / 365)
             message = f"{years} years old"
 
         gx_output.c_log(f"Contributor account created: {contributor.get('created_at')}, is {message}.", rtype="profiling")
@@ -113,14 +114,15 @@ def run(gx_context, gx_output):
 
         if len(commits) > 0:
             commits_message = f", at {commits[0]['commit']['author']['date']}."
+            oldest_commit = commits[-1]['commit']['author']['date']
             if len(commits) > 1:
-                commits_message = f", first one at {commits[-1]['commit']['author']['date']} and last one at {commits[0]['commit']['author']['date']}."
-
-            gx_output.c_log(f'Made (to this repo) {len(commits)} commits{commits_message}', rtype="profiling")
+                commits_message = f", first one at {oldest_commit} and last one at {commits[0]['commit']['author']['date']}."
+            gx_output.c_log(f'Made (to this repo) {len(commits)} commits{commits_message}', rtype="commits")
 
         signed_commits = []
         failed_verifications = []
         signature_attributes = []
+        dates_mismatch_commits = []
         print(f"\r[{c_users_index}/{len(c_users)}] Analyzing {len(commits)} commits and any signing keys for {contributor.get('login')}"+' '*40, end = '', flush=True)
         for commit in commits:
             c = commit["commit"]
@@ -164,6 +166,13 @@ def run(gx_context, gx_output):
                 contributor_emails.append(c["author"]["email"]) 
                 gx_context.linkIdentifier("EMAIL", [c["author"]["email"]], contributor_login)
 
+            if gh_time.parse_date(c["author"]["date"]) < contributor_created_at_time or gh_time.parse_date(c['committer']['date']) < contributor_created_at_time:
+                dates_mismatch_commits.append(c)
+
+        if len(dates_mismatch_commits) > 0:
+            gx_output.c_log(f"WARNING: UNRELIABLE DATES in {len(dates_mismatch_commits)} commits by Contributor [{contributor_login}]. The GitHub account is newer than the commit! Unreliable historic activity or account re-use.", rtype="commits")
+            gx_output.c_log(f"View commits with unreliable DATES here: https://github.com/{repository.get('full_name')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="urls")
+            gx_context.linkIdentifier("DATE_MISMATCH_COMMITS", [len(dates_mismatch_commits)], contributor_login)
 
         # PGP Signature attributes: We have precise Key IDs used in signatures + details on signature creation time and algorithm
         unique_pgp_pka = set(attribute.get('pgp_publicKeyAlgorithm') for attribute in signature_attributes if attribute.get('pgp_pulicKeyAlgorithm') is not None)
@@ -322,7 +331,7 @@ def run(gx_context, gx_output):
             gx_output.c_log(f"Contributor has {len(failed_verifications)} failed attempts at signing commits and 0 succesful commits signed out of their {len(commits)} total commits.", rtype="signatures")
 
         if len(signed_commits) > 0 and len(signed_commits) < len(commits):
-            gx_output.c_log(f"Contributor has a mix of {len(signed_commits)} signed vs. {len(commits)-len(signed_commits)} unsigned commits (in this repo).", rtype="signatures")
+            gx_output.c_log(f"Contributor has a mix of {len(signed_commits)} signed vs. {len(commits)-len(signed_commits)} unsigned commits (in this repo).", rtype="commits")
 
         for scommit in signed_commits: 
             if scommit['verification']['reason'] != 'valid': print(scommit) # This shouldn't happen
