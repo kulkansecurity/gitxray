@@ -81,4 +81,12 @@ class Context:
 
         return dict(collisions)
 
+    def getIdentifierValues(self, identifierType):
+        results = defaultdict(list)
+        for (currentIdentifierType, identifierValue), contributors in self._identifier_user_relationship.items():
+            if currentIdentifierType == identifierType:
+                for contributor in contributors:
+                    if identifierValue not in results[contributor]:
+                        results[contributor].append(identifierValue)
+        return dict(results)
 
