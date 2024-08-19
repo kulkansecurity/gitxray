@@ -99,7 +99,7 @@ def log_events(events, gx_output, for_repository=False):
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#watchevent
         elif etype == "WatchEvent":
-            logging_func(f"{ts}: {actor}{action} starred a repository: [{event.get('repo').get('name')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor} starred a repository: [{event.get('repo').get('name')}]", rtype="v_90d_events")
         else:
             logging_func(f"Missing parser in recent events for: {etype} with {payload}", rtype="debug")
 
