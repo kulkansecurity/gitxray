@@ -35,6 +35,20 @@ gitxray -r https://github.com/SampleOrg/SampleRepo -v -f user_input
 
 Associations MUST NOT be directly and blindly used to report fake or shadow accounts. They are automatic observations from a piece of well-intended code. Do NOT treat association results as findings directly. We must protect open-source projects by first and foremost respecting open-source developers. Ensure that any actions taken are thoughtful and based on solid evidence, not just automated associations. 
 
+## Untrustworthy Repositories and Activity &#127988;
+
+`gitxray` can be used to protect yourself, your team and your customers from fake Repositories and suspicious activity. For example, by analyzing commit dates and comparing them to the account creation timestamp of contributors, `gitxray` can flag inconsistencies that may indicate:
+
+* Tampered Commits: Some repositories may be manipulated to appear older than they actually are, such as claiming that all commits date back six years when the repository was only created a week ago. This tactic is often used to increase perceived value. Unfortunately, altering commit dates is relatively easy in Git, and GitHub is no exception. More on this [here](https://www.reddit.com/r/git/comments/ympce5/is_it_possible_to_change_commit_date/).
+
+* Reclaimed Usernames: Trusted contributors might have had their accounts deleted and then re-registered by malicious actors. GitHub allows a username to be re-released after 90 days, making this a possible attack vector. Learn more about GitHub’s account deletion policy [here](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-personal-account/deleting-your-personal-account#deleting-your-personal-account).
+
+Although we always recommend running a full unfiltered verbose X-Ray, it is possible to focus on unreliable historic activity by filtering for Warning keywords:
+
+``` 
+gitxray -o https://github.com/SampleOrg -v -f warning
+```
+
 ## The PR Rejection Awards &#127942; 
 
 Another `gitxray` feature is the ability to list a TOP 3 of GitHub accounts that have tried to submit Pull Requests to the repository, which ended up closed AND NOT merged. In certain emotional scenarios, this could be paraphrased as _rejected PRs_. Kidding aside, in some cases, this could lead to identifying Contributors who have repeatedly failed at merging a very evidently unaligned piece of code to a branch (I know, it sounds unlikely for an account to try and merge backdoor.py repeatedly... but is it?).

@@ -6,6 +6,13 @@ The Octocat getting X-Rayed  | [![Build Workflows](https://github.com/kulkansecu
 ![Gitxray Logo](https://kulkansecurity.github.io/gitxray/images/logo_gitxray.png "Gitxray Logo") | ![Gitxray Console](https://kulkansecurity.github.io/gitxray/images/console_gitxray.png "Gitxray Console")
 <div style="clear: both;"></div>
 
+# What is it for?
+* [Finding sensitive information in contributor profiles](/awesome_features/#unintended-disclosures-in-contributor-profiles) disclosed by accident within, for example, Armored PGP Keys, or Key Names.
+* Identifying threat actors in a Repository. [You may spot co-owned or shared accounts](/awesome_features/#spotting-shared-co-owned-or-fake-contributors), as well as inspect public events to [spot fake Stargazers](/awesome_features/#fake-stars-private-repos-gone-public-and-more).
+* Collecting [email addresses and analyzing contributor accounts](/more_features/#lots-of-e-mail-addresses-and-profiling-data) belonging to GitHub organizations and repositories.
+* Identifying fake or infected Repositories. It can [detect tampered commit dates](/awesome_features/#untrustworthy-repositories-and-activity) as well as, for example, [Release assets updated post-release](/more_features/#looking-out-for-malicious-releases-and-assets).
+* And so. much. more.
+
 # Getting started
 * [Installing Gitxray](installing.md)
 * [Awesome Features](awesome_features.md) &#128171;
