@@ -25,8 +25,9 @@ def run(gx_context, gx_output):
 
     # If focused on a contributor, let's first make sure the contributor exists in the repository
     if contributor_scope != None:
-        if not any(contributor.get('login') in contributor_scope for contributor in gx_context.getContributors()):
-            gx_output.warn(f"One of the collaborators you specified {contributor_scope} were not found as a contributor in the repo. Quitting..")
+        if not gx_context.areContributors(contributor_scope): 
+            gx_output.warn(f"One of the collaborators you specified {contributor_scope} were not found as a contributor in the repo.")
+            gx_output.warn(f"If you intend to filter results for a non-contributor, using the filter function instead (eg. -f johnDoe03). Quitting..")
             return False
 
     # Were were invoked to just list contributors and quit?
@@ -72,22 +73,22 @@ def run(gx_context, gx_output):
         gx_output.c_log(f"Owned repositories: https://github.com/{contributor_login}?tab=repositories", rtype="urls")
 
         if contributor.get('name') != None:
-            gx_output.c_log(f"[Name: {contributor.get('name')}] obtained from the user's profile", rtype="personal")
+            gx_output.c_log(f"[Name: {contributor.get('name')}] obtained from the user's profile.", rtype="personal")
 
         if contributor.get('twitter_username') != None:
-            gx_output.c_log(f"[X/Twitter account: {contributor.get('twitter_username')}] obtained from the user's profile", rtype="personal")
+            gx_output.c_log(f"[X/Twitter account: {contributor.get('twitter_username')}] obtained from the user's profile.", rtype="personal")
         if contributor.get('bio') != None:
             bio = contributor.get('bio').replace("\r\n"," | ")
-            gx_output.c_log(f"[Bio: {bio}] obtained from the profile", rtype="personal")
+            gx_output.c_log(f"[Bio: {bio}] obtained from the profile.", rtype="personal")
         if contributor.get('company') != None:
-            gx_output.c_log(f"[Company: {contributor.get('company')}] obtained from the user's profile", rtype="personal")
+            gx_output.c_log(f"[Company: {contributor.get('company')}] obtained from the user's profile.", rtype="personal")
         if contributor.get('blog') != None and len(contributor.get('blog')) > 0:
-            gx_output.c_log(f"[Blog: {contributor.get('blog')}] obtained from the user's profile", rtype="personal")
+            gx_output.c_log(f"[Blog: {contributor.get('blog')}] obtained from the user's profile.", rtype="personal")
         if contributor.get('location') != None:
-            gx_output.c_log(f"[Location: {contributor.get('location')}] obtained from the user's profile", rtype="personal")
+            gx_output.c_log(f"[Location: {contributor.get('location')}] obtained from the user's profile.", rtype="personal")
 
         if contributor.get('email') != None:
-            gx_output.c_log(f"[{contributor.get('email')}] obtained from the user's profile", rtype="emails")
+            gx_output.c_log(f"[{contributor.get('email')}] obtained from the user's profile.", rtype="emails")
             gx_context.linkIdentifier("EMAIL", [contributor.get('email')], contributor_login)
 
         contributor_created_at_time = gh_time.parse_date(contributor.get('created_at'))
@@ -126,6 +127,7 @@ def run(gx_context, gx_output):
         print(f"\r[{c_users_index}/{len(c_users)}] Analyzing {len(commits)} commits and any signing keys for {contributor.get('login')}"+' '*40, end = '', flush=True)
         for commit in commits:
             c = commit["commit"]
+
             v_reason = c["verification"]["reason"]
             if c["verification"]["verified"] == True:
                 try:
@@ -162,16 +164,16 @@ def run(gx_context, gx_output):
                 failed_verifications.append(c)
 
             if c["author"]["email"] not in contributor_emails: 
-                gx_output.c_log(f"[{c['author']['email']}] obtained by parsing a commit dated {c['author']['date']}", rtype="emails")
+                gx_output.c_log(f"[{c['author']['email']}] obtained by parsing commits.", rtype="emails")
                 contributor_emails.append(c["author"]["email"]) 
                 gx_context.linkIdentifier("EMAIL", [c["author"]["email"]], contributor_login)
 
-            if gh_time.parse_date(c["author"]["date"]) < contributor_created_at_time or gh_time.parse_date(c['committer']['date']) < contributor_created_at_time:
+            if gh_time.parse_date(c['author']['date']) < contributor_created_at_time:
                 dates_mismatch_commits.append(c)
 
         if len(dates_mismatch_commits) > 0:
-            gx_output.c_log(f"WARNING: UNRELIABLE DATES in {len(dates_mismatch_commits)} commits by Contributor [{contributor_login}]. The GitHub account is newer than the commit! Unreliable historic activity or account re-use.", rtype="commits")
-            gx_output.c_log(f"View commits with unreliable DATES here: https://github.com/{repository.get('full_name')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="urls")
+            gx_output.c_log(f"WARNING: UNRELIABLE DATES (Older than Account) in {len(dates_mismatch_commits)} commits by [{contributor_login}]. Potential tampering, account re-use, or Rebase. List at: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
+            gx_output.c_log(f"View commits with unreliable DATES here: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
             gx_context.linkIdentifier("DATE_MISMATCH_COMMITS", [len(dates_mismatch_commits)], contributor_login)
 
         # PGP Signature attributes: We have precise Key IDs used in signatures + details on signature creation time and algorithm
@@ -210,7 +212,7 @@ def run(gx_context, gx_output):
         if pgp_keys != None and len(pgp_keys) > 0:
             primary_key_ids = [key.get('key_id') for key in pgp_keys]
             gx_output.c_log(f"{len(pgp_keys)} Primary PGP Keys in this contributor's profile: {str(primary_key_ids)}", rtype="keys")
-            gx_output.c_log(f"PGP Keys: https://api.github.com/users/{contributor_login}/gpg_keys", rtype="urls")
+            gx_output.c_log(f"PGP Keys: https://api.github.com/users/{contributor_login}/gpg_keys", rtype="keys")
 
         for primary_key in pgp_keys:
             # Let's parse and drain info from raw_key fields in primary keys
@@ -284,7 +286,7 @@ def run(gx_context, gx_output):
         ssh_signing_keys = gh_api.fetch_ssh_signing_keys(contributor_login)
         if len(ssh_signing_keys) > 0:
             gx_output.c_log(f"{len(ssh_signing_keys)} SSH Keys used for Signatures in this contributor's profile", rtype="keys")
-            gx_output.c_log(f"SSH Signing Keys: https://api.github.com/users/{contributor_login}/ssh_signing_keys", rtype="urls")
+            gx_output.c_log(f"SSH Signing Keys: https://api.github.com/users/{contributor_login}/ssh_signing_keys", rtype="keys")
 
         for ssh_signing_key in ssh_signing_keys:
             algorithm = gx_ugly_ssh_parser.ugly_inhouse_ssh_key(ssh_signing_key.get('key'))
@@ -298,7 +300,7 @@ def run(gx_context, gx_output):
         ssh_auth_keys = gh_api.fetch_ssh_auth_keys(contributor_login)
         if len(ssh_auth_keys) > 0:
             gx_output.c_log(f"{len(ssh_auth_keys)} SSH Authentication Keys in this contributor's profile", rtype="keys")
-            gx_output.c_log(f"SSH Authentication Keys: https://api.github.com/users/{contributor_login}/keys", rtype="urls")
+            gx_output.c_log(f"SSH Authentication Keys: https://api.github.com/users/{contributor_login}/keys", rtype="keys")
 
         # We don't keep track of duplicate/cloned keys for authentication SSH keys because GitHub won't allow them
         # https://docs.github.com/en/authentication/troubleshooting-ssh/error-key-already-in-use
@@ -307,7 +309,7 @@ def run(gx_context, gx_output):
             algorithm = f"of type [{algorithm}] " if algorithm != None else ""
             gx_output.c_log(f"SSH Authentication Key ID [{ssh_auth_key.get('id')}] {algorithm}in profile.", rtype="keys")
 
-        gx_output.c_log(f"All commits (for this Repo): https://github.com/{repository.get('full_name')}/commits/?author={contributor_login}", rtype="urls")
+        gx_output.c_log(f"All commits (for this Repo): {repository.get('html_url')}/commits/?author={contributor_login}", rtype="commits")
         # Unique key ids for now only holds keys we've extracted from commit signatures
         if len(unique_pgp_keyids) > 0:
             # https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#constructing-a-search-query
