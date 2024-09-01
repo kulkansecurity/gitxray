@@ -9,9 +9,20 @@ The Octocat getting X-Rayed  | [![Build Workflows](https://github.com/kulkansecu
 # Use cases
 Gitxray can be used to, for example:
 - Find sensitive information in contributor profiles disclosed by accident within, for example, Armored PGP Keys, or Key Names.
+
+` gitxray -r https://github.com/some-org/some-repository -v -f user_input`
 - Identify threat actors in a Repository. You may spot co-owned or shared accounts, as well as inspect public events to spot fake Stargazers.
+
+` gitxray -r https://github.com/some-org/some-repository -v -f keys,association,starred`
 - Identify fake or infected Repositories. It can detect tampered commit dates as well as, for example, Release assets updated post-release.
-- And a lot more!
+
+` gitxray -r https://github.com/some-org/some-repository -v -f warning`
+- Forensics use-cases, such as filtering results by date in order to check what else happened on the day of an incident.
+
+` gitxray -r https://github.com/some-org/some-repository -v -f 2024-09-01`
+- And a lot more! Run a full X-Ray in Verbose mode to collect a ton of data.
+
+` gitxray -r https://github.com/some-org/some-repository -v`
 
 Please refer to the Documentation for additional use-cases and introductory information.
 
