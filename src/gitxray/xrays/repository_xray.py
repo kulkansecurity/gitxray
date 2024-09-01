@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from collections import defaultdict
 import math
-from gitxray.include import gh_api, gh_time, gh_public_events
+from gitxray.include import gh_api, gh_time, gh_public_events, gh_reactions
 
 def run(gx_context, gx_output):
     print("Running verifications on the repository..")
@@ -18,17 +18,146 @@ def run(gx_context, gx_output):
     if repository.get('homepage'):
         gx_output.r_log(f"Homepage: [{repository.get('homepage')}]", rtype="urls")
 
-    print(f"Checking for repository deployments..", end="")
+    # These go in the repository xray and not contributors because the REST API returns all per repository
+    # https://api.github.com/repos/infobyte/faraday/issues/comments - and won't allow filtering in a helpful (to us) way
+    print(f"Getting all repository comments on commits.."+" "*40, end="")
+    commit_comments = gh_api.fetch_repository_commit_comments(repository)
+    if len(commit_comments) > 0: 
+        total_comments = defaultdict(int)
+        positive_reactions = defaultdict(int)
+        negative_reactions = defaultdict(int)
+        neutral_reactions = defaultdict(int)
+        for cc in commit_comments:
+            gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
+            login = cc.get('user').get('login')
+            message = f"User {login} added a comment to a Commit on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
+            total_comments[login] += 1
+            gx_output.c_log(message, rtype="v_comments", contributor=login)
+
+            created_at_ts = gh_time.parse_date(cc.get('created_at'))
+            updated_at_ts = gh_time.parse_date(cc.get('updated_at'))
+            # Comments updated after a day of being posted are of interest; they are not typo edits made right away.
+            if (updated_at_ts-created_at_ts).days > 0:
+                gx_output.c_log(f"A comment by [{login}] on a Commit was updated {(updated_at_ts-created_at_ts).days} days after being created: {cc.get('html_url')}", rtype="comments", contributor=login)
+
+        for login,ccount in total_comments.items():        
+            if not gx_context.isContributor(login):
+                login_tmp = f"{login} [NOT a contributor]"
+            else:
+                login_tmp = login
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Commits. Full breakdown of comments available in Verbose mode.", rtype="comments", contributor=login)
+            #gx_output.c_log(f"{ccount} Comments added to Commits by [{login}] available at: {repository.get('url')}/comments", rtype="comments")
+
+        # Not adding much value 
+        gx_output.r_log(f"{len(commit_comments)} Comments in commits available at: {repository.get('url')}/comments", rtype="comments")
+
+        # Comment with the most reactions
+        if len(positive_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(positive_reactions)[0]
+            if count > 0: gx_output.r_log(f"The Commits comment with the most POSITIVE reactions ({count}) is available at: {url}", rtype="comments")
+        if len(negative_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(negative_reactions)[0]
+            if count > 0: gx_output.r_log(f"The Commits comment with the most NEGATIVE reactions ({count}) is available at: {url}", rtype="comments")
+        if len(neutral_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(neutral_reactions)[0]
+            if count > 0: gx_output.r_log(f"The Commits comment with the most NEUTRAL reactions ({count}) is available at: {url}", rtype="comments")
+
+    
+    print(f"\rGetting all repository comments on issues.."+" "*30, end="")
+    issues_comments = gh_api.fetch_repository_issues_comments(repository)
+    if len(issues_comments) > 0: 
+        total_comments = defaultdict(int)
+        positive_reactions = defaultdict(int)
+        negative_reactions = defaultdict(int)
+        neutral_reactions = defaultdict(int)
+        for cc in issues_comments:
+            gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
+            login = cc.get('user').get('login')
+            message = f"User [{login}] added a comment to an Issue on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
+            total_comments[login] += 1
+            gx_output.c_log(message, rtype="v_comments", contributor=login)
+
+            created_at_ts = gh_time.parse_date(cc.get('created_at'))
+            updated_at_ts = gh_time.parse_date(cc.get('updated_at'))
+            # Comments updated after a day of being posted are of interest; they are not typo edits made right away.
+            if (updated_at_ts-created_at_ts).days > 0:
+                gx_output.c_log(f"A comment by [{login}] on an Issue was updated {(updated_at_ts-created_at_ts).days} days after being created: {cc.get('html_url')}", rtype="comments", contributor=login)
+
+        for login,ccount in total_comments.items():
+            if not gx_context.isContributor(login):
+                login_tmp = f"{login} [NOT a contributor]"
+            else:
+                login_tmp = login
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Issues. Full breakdown of comments available in Verbose mode.", rtype="comments", contributor=login)
+            #gx_output.c_log(f"{ccount} Comments added to Issues by [{login}] available at: {repository.get('url')}/issues/comments", rtype="comments")
+
+        gx_output.r_log(f"{len(issues_comments)} Comments in issues available at: {repository.get('url')}/issues/comments", rtype="comments")
+
+        # Comment with the most reactions
+        if len(positive_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(positive_reactions)[0]
+            if count > 0: gx_output.r_log(f"The Issues comment with the most POSITIVE reactions ({count}) is available at: {url}", rtype="comments")
+        if len(negative_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(negative_reactions)[0]
+            if count > 0: gx_output.r_log(f"The Issues comment with the most NEGATIVE reactions ({count}) is available at: {url}", rtype="comments")
+        if len(neutral_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(neutral_reactions)[0]
+            if count > 0: gx_output.r_log(f"The Issues comment with the most NEUTRAL reactions ({count}) is available at: {url}", rtype="comments")
+
+    print(f"\rGetting all repository comments on pull requests.."+" "*30, end="")
+    pulls_comments = gh_api.fetch_repository_pulls_comments(repository)
+    if len(pulls_comments) > 0: 
+        total_comments = defaultdict(int)
+        positive_reactions = defaultdict(int)
+        negative_reactions = defaultdict(int)
+        neutral_reactions = defaultdict(int)
+        for cc in pulls_comments:
+            gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
+            login = cc.get('user').get('login')
+            message = f"User {login} added a comment to a PR on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
+            total_comments[login] += 1
+            gx_output.c_log(message, rtype="v_comments", contributor=login)
+
+            created_at_ts = gh_time.parse_date(cc.get('created_at'))
+            updated_at_ts = gh_time.parse_date(cc.get('updated_at'))
+            # Comments updated after a day of being posted are of interest; they are not typo edits made right away.
+            if (updated_at_ts-created_at_ts).days > 0:
+                gx_output.c_log(f"A comment by [{login}] on a PR was updated {(updated_at_ts-created_at_ts).days} days after being created: {cc.get('html_url')}", rtype="comments", contributor=login)
+
+        for login,ccount in total_comments.items():        
+            if not gx_context.isContributor(login):
+                login_tmp = f"{login} [NOT a contributor]"
+            else:
+                login_tmp = login
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to PRs. Full breakdown of comments available in Verbose mode.", rtype="comments", contributor=login)
+            #gx_output.c_log(f"{ccount} Comments added to PRs by [{login}] available at: {repository.get('url')}/pulls/comments", rtype="comments")
+
+        gx_output.r_log(f"{len(pulls_comments)} Comments in pulls available at: {repository.get('url')}/pulls/comments", rtype="comments")
+
+        # Comment with the most reactions
+        if len(positive_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(positive_reactions)[0]
+            if count > 0: gx_output.r_log(f"The PRs comment with the most POSITIVE reactions ({count}) is available at: {url}", rtype="comments")
+        if len(negative_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(negative_reactions)[0]
+            if count > 0: gx_output.r_log(f"The PRs comment with the most NEGATIVE reactions ({count}) is available at: {url}", rtype="comments")
+        if len(neutral_reactions) > 0:
+            url, count = gh_reactions.sort_reactions(neutral_reactions)[0]
+            if count > 0: gx_output.r_log(f"The PRs comment with the most NEUTRAL reactions ({count}) is available at: {url}", rtype="comments")
+
+
+    print(f"\rChecking for repository deployments.."+" "*30, end="")
     if repository.get('deployments_url'):
          deployments = gh_api.fetch_repository_deployments(repository)
-         if len(deployments) > 0: gx_output.r_log(f"{len(deployments)} Deployments available at: [{repository.get('html_url')}/deployments]", rtype="urls")
+         if len(deployments) > 0: gx_output.r_log(f"{len(deployments)} Deployments available at: [{repository.get('html_url')}/deployments]", rtype="deployments")
 
     print(f"\rChecking for repository environments.."+" "*30, end="")
     environments = gh_api.fetch_repository_environments(repository)
-    if environments != None and environments.get('total_count') > 0:
-        gx_output.r_log(f"{environments.get('total_count')} Environments available at: [{repository.get('url')}/environments]", rtype="urls")
+    if environments != None and environments.get('total_count') != None and environments.get('total_count') > 0:
+        gx_output.r_log(f"{environments.get('total_count')} Environments available at: [{repository.get('url')}/environments]", rtype="environments")
         for environment in environments.get('environments'):
             gx_output.r_log(f"Environment [{environment.get('name')}] created [{environment.get('created_at')}], updated [{environment.get('updated_at')}]: {environment.get('html_url')}", rtype="environments")
+            #print(gh_api.fetch_environment_protection_rules(repository, environment.get('name')))
 
     print(f"\rChecking for repository forks.."+" "*30, end="")
     if repository.get('forks_count') > 0:
@@ -37,14 +166,37 @@ def run(gx_context, gx_output):
     print(f"\rQuerying for repository action workflows.."+" "*30, end="")
     workflows = gh_api.fetch_repository_actions_workflows(repository)
     if workflows != None and workflows.get('total_count') > 0:
-        gx_output.r_log(f"{workflows.get('total_count')} Workflows available at: [{repository.get('url')}/actions/workflows]", rtype="urls")
+        gx_output.r_log(f"{workflows.get('total_count')} Workflows available at: [{repository.get('url')}/actions/workflows]", rtype="workflows")
         for workflow in workflows.get('workflows'):
             gx_output.r_log(f"Workflow [{workflow.get('name')}] created [{workflow.get('created_at')}], updated [{workflow.get('updated_at')}]: {workflow.get('html_url')}", rtype="workflows")
 
-    print(f"\rQuerying for repository action artifacts.."+" "*30, end="")
-    artifacts = gh_api.fetch_repository_actions_artifacts(repository)
+        print(f"\rAnalyzing repository action workflow runs (Analysis capped to 5000 max).."+" "*30, end="")
+        # Some repositories have dozens of thousands of runs, which we could analyze Buuuut, it would take forever.
+        # Therefore we prioritize medium size repositories with < 5000 runs (as of today at least)
+        runs = gh_api.fetch_repository_actions_runs(repository, limit=5000)
+        if runs != None and runs.get('total_count') > 0:
+            gx_output.r_log(f"{workflows.get('total_count')} Workflows were run {runs.get('total_count')} times: [{repository.get('url')}/actions/runs]", rtype="workflows")
+            # Pending adding more functionality here to analyse workflow runs, although capped.
+            run_actors = defaultdict(int)
+            for run in runs.get('workflow_runs'):
+                run_actors[run.get('actor').get('login')] += 1
+
+            total_runs = int(runs.get('total_count'))
+            for actor, actor_runs in run_actors.items():
+                percentage_runs = (actor_runs / total_runs) * 100
+                if gx_context.isContributor(actor):
+                    message = f"User {actor} triggered {actor_runs} workflow runs [{percentage_runs:.2f}%] - See them at: [{repository.get('html_url')}/actions?query=actor%3A{actor}]"
+                else:
+                    message = f"WARNING: {actor} is NOT a contributor to this repository and yet triggered {actor_runs} workflow runs [{percentage_runs:.2f}%] - See them at: [{repository.get('html_url')}/actions?query=actor%3A{actor}]"
+
+                gx_output.c_log(message, rtype="workflows", contributor=actor)
+                gx_output.r_log(message, rtype="workflows")
+
+
+    print(f"\rQuerying for repository action artifacts (Analysis capped to 5000 max).."+" "*30, end="")
+    artifacts = gh_api.fetch_repository_actions_artifacts(repository, limit=5000)
     if artifacts != None and artifacts.get('total_count') > 0:
-        gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="urls")
+        gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="artifacts")
         for artifact in artifacts.get('artifacts'):
             # There are normally multiple artifacts hence we keep them under verbose.
             gx_output.r_log(f"Artifact [{artifact.get('name')}] created [{artifact.get('created_at')}], updated [{artifact.get('updated_at')}]: {artifact.get('url')}", rtype="v_artifacts")
@@ -55,12 +207,12 @@ def run(gx_context, gx_output):
             # This shouldn't happen but we still run a check; artifacts can't be updated but instead completely overwritten
             # More data here: https://github.com/actions/upload-artifact#overwriting-an-artifact
             if (updated_at_ts-created_at_ts).days > 0:
-                gx_output.r_log(f"An artifact [{artifact.get('name')}] was updated {(updated_at_ts-created_at_ts).days} days after being created: {artifact.get('url')}", rtype="artifacts")
+                gx_output.r_log(f"WARNING: An artifact [{artifact.get('name')}] was updated {(updated_at_ts-created_at_ts).days} days after being created: {artifact.get('url')}", rtype="artifacts")
 
     print(f"\rInspecting repository branches.."+" "*40, end="")
     branches = gh_api.fetch_repository_branches(repository)
     if len(branches) > 0: 
-        gx_output.r_log(f"{len(branches)} Branches available at: [{repository.get('html_url')}/branches]", rtype="urls")
+        gx_output.r_log(f"{len(branches)} Branches available at: [{repository.get('html_url')}/branches]", rtype="branches")
         unprotected_branches = []
         protected_branches = []
         for branch in branches:
@@ -72,9 +224,17 @@ def run(gx_context, gx_output):
         if len(unprotected_branches) > 0: gx_output.r_log(f"{len(unprotected_branches)} Unprotected Branches: {unprotected_branches}", rtype="branches")
         if len(protected_branches) > 0: gx_output.r_log(f"{len(protected_branches)} Protected Branches: {protected_branches}", rtype="branches")
 
+    print(f"\rInspecting repository labels.."+" "*40, end="")
+    labels = gh_api.fetch_repository_labels(repository)
+    if len(labels) > 0: 
+        gx_output.r_log(f"{len(labels)} Labels available at: [{repository.get('html_url')}/labels]", rtype="labels")
+        non_default_labels = [label.get('name') for label in labels if label.get('default') == False]
+        if len(non_default_labels) > 0:
+            gx_output.r_log(f"{len(non_default_labels)} Non-default Labels: {non_default_labels} available at: [{repository.get('html_url')}/labels]", rtype="labels")
+
     print(f"\rInspecting repository tags.."+" "*40, end="")
     tags = gh_api.fetch_repository_tags(repository)
-    if len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="urls")
+    if len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="tags")
     tag_taggers = defaultdict(int)
 
     """ A bit shameful here because we can't really get too much data out of tags because of the way the GH API is implemented.
@@ -96,9 +256,9 @@ def run(gx_context, gx_output):
         gx_output.r_log(message, rtype="tags")
 
 
-    print(f"\rInspecting repository releases.."+" "*40, end="")
+    print(f"\rInspecting repository releases.."+" "*40)
     releases = gh_api.fetch_repository_releases(repository)
-    if len(releases) > 0: gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="urls")
+    if len(releases) > 0: gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="releases")
 
     release_authors = defaultdict(int)
     asset_uploaders = defaultdict(int)
@@ -127,7 +287,10 @@ def run(gx_context, gx_output):
     asset_uploaders_set = set(asset_uploaders.keys())
     for author, releases in release_authors.items():
         percentage_releases = (releases / total_releases) * 100
-        message = f"User {author} created historically {releases} releases [{percentage_releases:.2f}%]"
+        if gx_context.isContributor(author):
+            message = f"User {author} created historically {releases} releases [{percentage_releases:.2f}%]"
+        else:
+            message = f"WARNING: {author} is NOT a contributor to this repository and yet created historically {releases} releases [{percentage_releases:.2f}%]"
 
         # Check if the author has also uploaded assets
         if author in asset_uploaders:
@@ -193,11 +356,15 @@ def run(gx_context, gx_output):
                             print(f"Group length: {len(group)} - Group ID: {group_key}: Range {range_start} to {range_end}, Members: {len(group)}, Logins: {logins}")
         """
 
-    if repository.get('watchers_count') > 0:
-        gx_output.r_log(f"Watchers count: [{repository.get('subscribers_count')}] List at: {repository.get('subscribers_url')}", rtype="profiling")
+    watchers_message = f"Watchers count: [{repository.get('subscribers_count')}]"
+    if repository.get('subscribers_count') > 0:
+        watchers_message += f" List at: {repository.get('subscribers_url')}"
+    gx_output.r_log(watchers_message, rtype="profiling")
 
+    stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
     if repository.get('stargazers_count') > 0:
-        gx_output.r_log(f"Stars count: [{repository.get('stargazers_count')}] List at: {repository.get('stargazers_url')}", rtype="profiling")
+        stargazers_message += f" List at: {repository.get('stargazers_url')}"
+    gx_output.r_log(stargazers_message, rtype="profiling")
 
     if repository.get('open_issues_count') > 0:
         gx_output.r_log(f"Repository has {repository.get('open_issues_count')} Open Issues: {repository.get('html_url')}/issues", rtype="profiling")
@@ -281,7 +448,7 @@ def run(gx_context, gx_output):
             if details['submitted'] > 0:
                 # Only add a link to the URL of PRs if it belongs to a user account
                 if user in clogins:
-                    gx_output.c_log(f"Pull Requests by {user} at: {repository.get('html_url')}/pulls?q=author%3a{user}", rtype="urls", contributor=user)
+                    gx_output.c_log(f"{details['submitted']} Pull Requests by [{user}] at: {repository.get('html_url')}/pulls?q=author%3a{user}", rtype="prs", contributor=user)
                 details['rejected_percent'] = (details['rejected'] / details['submitted']) * 100
             else:
                 details['rejected_percent'] = 0
@@ -319,7 +486,7 @@ def run(gx_context, gx_output):
 
     # Check if there were any users with mismatches in commits dates in the repository.
     for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS").items():
-            gx_output.r_log(f"WARNING: UNRELIABLE DATES in {dates_mismatch_commits} commits by Contributor [{user}]. The account is newer than the commit! Unreliable historic activity or account re-use.", rtype="commits")
+            gx_output.r_log(f"WARNING: UNRELIABLE DATES (Older than Account) in {dates_mismatch_commits} commits by [{user}]. Potential tampering, account re-use, or Rebase.", rtype="commits")
        
 
     """ This here next is Work in Progress - trying to figure out what to pay attention to here that makes sense.
