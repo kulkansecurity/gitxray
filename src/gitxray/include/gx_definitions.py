@@ -10,6 +10,10 @@ GITHUB_WEB_EDITOR_SIGNING_KEYS = ['4AEE18F83AFDEB23', 'B5690EEEBB952194']
 # This is ocd related, I needed my separators to match.
 SCREEN_SEPARATOR_LENGTH = 100
 
+REACTIONS_POSITIVE = ['+1', 'heart']
+REACTIONS_NEGATIVE = ['-1']
+REACTIONS_NEUTRAL = ['laugh', 'hooray', 'confused', 'rocket', 'eyes']
+
 OPENPGP_SIG_TYPES = {
     0x00: "Signature of a binary document",
     0x01: "Signature of a canonical text document",
