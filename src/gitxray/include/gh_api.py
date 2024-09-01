@@ -61,19 +61,22 @@ def github_request_json(url, params=None, limit_results=None):
                 continue # and restart the loop
 
         if all_results is None:
-            all_results = data
-        elif isinstance(all_results, list) and isinstance(data, list):
+           all_results = data
+        # if we come from all_results being a list, then we're extending it.
+        elif isinstance(all_results, list):
             all_results.extend(data)
-        elif isinstance(all_results, dict) and isinstance(data, dict):
-            all_results.update(data)
+        elif isinstance(all_results, dict) and data.get('total_count') != None:
+            all_results[list(all_results.keys())[1]].extend(list(data.values())[1])
         else:
-            raise TypeError("Inconsistent data types received from pagination.")
+            all_results.update(data)
 
         # Reset next_url
         next_url = None
 
         # Using "limit" we can cap the amount of results in order to prevent huge amounts of requests.
-        if limit_results == None or len(all_results) < limit_results:
+        if limit_results == None or \
+            ((isinstance(all_results, list) and len(all_results) < limit_results) \
+            or (isinstance(all_results, dict) and all_results.get('total_count') != None and len(list(all_results.values())[1]) < limit_results)):
             if 'rel="next"' in links:
                 for link in links.split(','):
                     if 'rel="next"' in link:
@@ -126,17 +129,32 @@ def fetch_repository_custom_values(repo):
 def fetch_repository_public_events(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/events")
 
+def fetch_repository_commit_comments(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/comments")
+
+def fetch_repository_issues_comments(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/issues/comments")
+
+def fetch_repository_pulls_comments(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/pulls/comments")
+
 def fetch_repository_actions_workflows(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/workflows")
 
-def fetch_repository_actions_artifacts(repo):
-    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/artifacts")
+def fetch_repository_actions_artifacts(repo, limit):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/artifacts", limit_results=limit)
+
+def fetch_repository_actions_runs(repo, limit):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/runs", limit_results=limit)
 
 def fetch_repository_releases(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/releases")
 
 def fetch_repository_tags(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/tags")
+
+def fetch_repository_labels(repo):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/labels")
 
 def fetch_repository_branches(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/branches")
@@ -149,6 +167,9 @@ def fetch_repository_deployments(repo):
 
 def fetch_repository_environments(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/environments")
+
+def fetch_environment_protection_rules(repo, environment):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/environments/{environment}/deployment_protection_rules")
 
 def fetch_repository_pull_requests(repo):
     return github_request_json(repo.get('pulls_url').replace("{/number}",""), {'state':'all'})
