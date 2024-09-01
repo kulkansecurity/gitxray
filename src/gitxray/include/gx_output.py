@@ -148,7 +148,7 @@ class Output:
     def _create_text_output(self, outfile):
         skip_ansi = outfile != None
         output = self._print_output(self._repositories, f"Repository https://github.com/ENTITY_STR", skip_ansi)
-        output += self._print_output(self._contributors, f"repository Contributor ENTITY_STR", skip_ansi)
+        output += self._print_output(self._contributors, f"account ENTITY_STR", skip_ansi)
 
         if len(self._anonymous) > 0 and len(next(iter(self._anonymous.values()))) > 1: # Did this so that I don't hardcode "#" as an index
             output += self._print_output(self._anonymous, "Anonymous Contributors (those with no GitHub account)", skip_ansi)
