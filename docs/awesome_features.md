@@ -2,7 +2,7 @@
 
 Because of the amount of data it analyzes, `gitxray` can be a bit overwhelming at first. Let's look at a few examples of potential awesome findings which can better explain why you're here and why `gitxray` is awesome &hearts;. 
 
-## Unintended disclosures in Contributor profiles &#129318;
+## Unintended disclosures in Contributor profiles &#128064;
 
 `gitxray` reports under a `user_input` category any user-supplied data that repository Contributors may have exposed via their GitHub accounts inadevertently. This is normally the case of PGP and SSH key name fields, which unfortunately are used by Users to record hostnames, computer models, password locations (e.g. in 1Password), or even the _password itself_ to a given key (which we all know might be the same password used elsewhere). To make things more interesting, `gitxray` also identifies any "excess" data found before, or after, PGP Armored keys published in a User's GitHub account. Wondering what that data normally is? Erroneous copy/pastes from the command line while exporting in ASCII/Armored format their keys. And what might that contain? Most of the times, a shell prompt revealing a local username, a hostname and a directory path. May I remind you all of this data is Public-facing.
 
@@ -34,6 +34,17 @@ gitxray -r https://github.com/SampleOrg/SampleRepo -v -f user_input
 ### Important 
 
 Associations MUST NOT be directly and blindly used to report fake or shadow accounts. They are automatic observations from a piece of well-intended code. Do NOT treat association results as findings directly. We must protect open-source projects by first and foremost respecting open-source developers. Ensure that any actions taken are thoughtful and based on solid evidence, not just automated associations. 
+
+## Forensics: What happened on the day of an incident? &#128269;
+
+Because `gitxray` collects data from multiple sources of activity including Commits, Comments, Workflow Runs, Issues, Deployments and more; and because Verbose mode in `gitxray` shows activity in a standarized YYYY-MM-DD format, it becomes possible to use Filtering in order to place focus on specific activity happening at a specific point in time.
+
+For example, by running `gitxray` with the following arguments, only results from that specific date are returned. You may place focus on a day, or even a month:
+
+``` 
+gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-08
+gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-09-01
+```
 
 ## Untrustworthy Repositories and Activity &#127988;
 

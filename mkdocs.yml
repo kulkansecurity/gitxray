@@ -12,7 +12,6 @@ nav:
   - 'installing.md'
   - 'awesome_features.md'
   - 'more_features.md'
-  - 'pending_work.md'
 
 markdown_extensions:
   - toc:
