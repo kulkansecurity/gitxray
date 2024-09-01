@@ -66,6 +66,12 @@ class Context:
     def getContributors(self):
         return self._contributors
 
+    def isContributor(self, contributor_login):
+        return any(contributor.get('login') == contributor_login for contributor in self.getContributors())
+
+    def areContributors(self, contributors_logins):
+        return any(contributor.get('login') in contributors_logins for contributor in self.getContributors())
+
     # We also use our gitxray context to cross-reference identifiers.
     def linkIdentifier(self, identifierType, identifierValues, contributorLogin):
         for identifierValue in identifierValues:
