@@ -1,5 +1,5 @@
-import os, requests, base64, re, time
-from . import gx_definitions
+import os, requests, base64, re, time, urllib
+from . import gx_definitions, gx_output
 
 # GitHub API URL
 GITHUB_API_BASE_URL = "https://api.github.com"
@@ -18,6 +18,34 @@ def make_request(url, headers, params):
     links = response.headers.get('Link', '')
     return data, links, rate_limit_remaining, rate_limit_reset
 
+def get_total_pages_from_link_header(links):
+    if not links:
+        return None
+
+    # Parse the Link header to find the "last" page
+    for link in links.split(','):
+        if 'rel="last"' in link:
+            last_page_url = link.split(';')[0].strip('<> ')
+            # Extract the page number from the URL
+            if 'page=' in last_page_url:
+                try:
+                    return int(last_page_url.split('page=')[-1].split('&')[0])
+                except ValueError:
+                    pass
+    return None
+
+def get_last_two_path_segments(url):
+    parsed_url = urllib.parse.urlparse(url)
+    path = parsed_url.path  
+    parts = [part for part in path.split("/") if part]  
+    if len(parts) >= 2:
+        return f"{parts[-2]}/{parts[-1]}"
+    elif len(parts) == 1:
+        return parts[-1]
+    else:
+        return "" 
+
+
 def github_request_json(url, params=None, limit_results=None):
     # https://docs.github.com/en/rest/about-the-rest-api/api-versions?apiVersion=2022-11-28
     headers = {"X-GitHub-Api-Version":"2022-11-28"}
@@ -31,57 +59,82 @@ def github_request_json(url, params=None, limit_results=None):
     all_results = None
     next_url = url
     remaining = -1
+    pages_fetched = 0
+    total_pages = None
+    start_time = time.time()
 
     while next_url:
 
         try:
-            data, links, remaining, reset = make_request(next_url, headers, params)
-        except Exception as ex:
-            print(ex)
-            print(f"Failed to talk to the GitHub API when fetching URL: {next_url} - Quitting.")
-            exit(-1)
 
-        if remaining == 0:
-            # Calculate how long to sleep, then sleep
-            sleep_time = reset - time.time()
-            if sleep_time > 0:
-                hours, remainder = divmod(int(sleep_time), 3600)
-                minutes, seconds = divmod(remainder, 60)
-                message = f"GitHub Rate limit reached. Sleeping for {hours} hours, {minutes} minutes, and {seconds} seconds. You may go and make coffee.."
-                print(f"\r\n\033[33m{message}\033[0m", flush=True)
-                if GITHUB_TOKEN == None:
-                    message = f"You should try using a Github Access Token, improves the experience significantly and it's easy!"
-                    print(f"\033[33m{message}\033[0m", flush=True)
-                    print("For information on how to create a GitHub API Access Token refer to: ")
-                    print("https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens")
-                    print("For information on GitHub Rate Limits refer to: ")
-                    print("https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api")
+            try:
+                data, links, remaining, reset = make_request(next_url, headers, params)
+            except Exception as ex:
+                print(ex)
+                print(f"Failed to talk to the GitHub API when fetching URL: {next_url} - Quitting.")
+                exit(-1)
 
-                time.sleep(sleep_time + 1)  # Sleep until the reset time, plus a little buffer
-                continue # and restart the loop
+            if remaining == 0:
+                # Calculate how long to sleep, then sleep
+                sleep_time = reset - time.time()
+                if sleep_time > 0:
+                    hours, remainder = divmod(int(sleep_time), 3600)
+                    minutes, seconds = divmod(remainder, 60)
+                    message = f"GitHub Rate limit reached. Sleeping for {hours} hours, {minutes} minutes, and {seconds} seconds. You may go and make coffee.."
+                    print(f"\r\n\033[33m{message}\033[0m", flush=True)
+                    if GITHUB_TOKEN == None:
+                        message = f"You should try using a Github Access Token, improves the experience significantly and it's easy!"
+                        print(f"\033[33m{message}\033[0m", flush=True)
+                        print("For information on how to create a GitHub API Access Token refer to: ")
+                        print("https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens")
+                        print("For information on GitHub Rate Limits refer to: ")
+                        print("https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api")
+    
+                    time.sleep(sleep_time + 1)  # Sleep until the reset time, plus a little buffer
+                    continue # and restart the loop
 
-        if all_results is None:
-           all_results = data
-        # if we come from all_results being a list, then we're extending it.
-        elif isinstance(all_results, list):
-            all_results.extend(data)
-        elif isinstance(all_results, dict) and data.get('total_count') != None:
-            all_results[list(all_results.keys())[1]].extend(list(data.values())[1])
-        else:
-            all_results.update(data)
+            if all_results is None:
+               all_results = data
+            # if we come from all_results being a list, then we're extending it.
+            elif isinstance(all_results, list):
+                all_results.extend(data)
+            elif isinstance(all_results, dict) and data.get('total_count') != None:
+                all_results[list(all_results.keys())[-1]].extend(list(data.values())[-1])
+            else:
+                all_results.update(data)
 
-        # Reset next_url
-        next_url = None
+            pages_fetched += 1
+            if total_pages is None:
+                total_pages = get_total_pages_from_link_header(links)
 
-        # Using "limit" we can cap the amount of results in order to prevent huge amounts of requests.
-        if limit_results == None or \
-            ((isinstance(all_results, list) and len(all_results) < limit_results) \
-            or (isinstance(all_results, dict) and all_results.get('total_count') != None and len(list(all_results.values())[1]) < limit_results)):
-            if 'rel="next"' in links:
-                for link in links.split(','):
-                    if 'rel="next"' in link:
-                        next_url = link.split(';')[0].strip('<> ')
-                        break
+            # Print progress if total pages is known
+            if total_pages:
+                progress = (pages_fetched / total_pages) * 100
+                elapsed_time = time.time() - start_time
+                avg_time_per_page = elapsed_time / pages_fetched
+                remaining_pages = total_pages - pages_fetched
+                estimated_time_left = remaining_pages * avg_time_per_page
+                time_estimate = f": {estimated_time_left:.0f} seconds left."
+                urlpath = get_last_two_path_segments(url)
+                print(f"\rFetching {urlpath} [Hit CTRL^C to skip]: ({progress:.2f}%) {time_estimate}" + " " * 30, flush=True, end="")
+
+            # Reset next_url
+            next_url = None
+
+            # Using "limit" we can cap the amount of results in order to prevent huge amounts of requests.
+            if limit_results == None or \
+                ((isinstance(all_results, list) and len(all_results) < limit_results) \
+                or (isinstance(all_results, dict) and all_results.get('total_count') != None and len(list(all_results.values())[-1]) < limit_results)):
+                if 'rel="next"' in links:
+                    for link in links.split(','):
+                        if 'rel="next"' in link:
+                            next_url = link.split(';')[0].strip('<> ')
+                            break
+
+        except KeyboardInterrupt:
+            print("\r\n\033[33mReceived CTRL+C - Skipping..\033[0m")
+            next_url = None
+
 
     return all_results
 
@@ -108,8 +161,11 @@ def fetch_repositories_for_org(org_url):
     org = org_url.strip('/').split('/')[-1]
     return github_request_json(f"{GITHUB_API_BASE_URL}/orgs/{org}/repos")
 
-def fetch_commits(repo, author=None, per_page=10):
-    return github_request_json(repo.get('commits_url').replace("{/sha}", f'?per_page={per_page}&author={author}' if author != None else ""))
+def fetch_repository_file_contents(repository, path):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repository.get('full_name')}/contents/{path}")
+
+def fetch_commits(repo, author=None):
+    return github_request_json(repo.get('commits_url').replace("{/sha}", f'?author={author}' if author != None else ""))
 
 def fetch_ssh_signing_keys(login):
     return github_request_json(f"{GITHUB_API_BASE_URL}/users/{login}/ssh_signing_keys")
@@ -141,10 +197,12 @@ def fetch_repository_pulls_comments(repo):
 def fetch_repository_actions_workflows(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/workflows")
 
-def fetch_repository_actions_artifacts(repo, limit):
+def fetch_repository_actions_artifacts(repo, limit=None):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/artifacts", limit_results=limit)
 
-def fetch_repository_actions_runs(repo, limit):
+def fetch_repository_actions_runs(repo, workflow_file=None, limit=None):
+    if workflow_file != None:
+        return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/workflows/{workflow_file}/runs", limit_results=limit)
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/actions/runs", limit_results=limit)
 
 def fetch_repository_releases(repo):
@@ -186,3 +244,5 @@ def fetch_contributor_contributions(repo, contributor_obj):
 def fetch_contributor_events(contributor_obj):
     return github_request_json(contributor_obj.get('events_url').replace("{/privacy}", ""))
 
+def search_repositories_by_name(name, limit):
+    return github_request_json(f"{GITHUB_API_BASE_URL}/search/repositories", {'q':name, 'type':'repositories','s':'stars','o':'desc'}, limit_results=limit)
