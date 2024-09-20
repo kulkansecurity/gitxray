@@ -9,6 +9,25 @@ def run(gx_context, gx_output):
     repository = gx_context.getRepository()
     contributors = gx_context.getContributors()
 
+    print(f"Checking for similar repository names in GitHub.."+" "*40, end="")
+    # This gets all repository names matching our repository name, sorted first by highest rating
+    similar_names = gh_api.search_repositories_by_name(repository.get('name'), limit=10)
+    if similar_names != None and similar_names.get('total_count') != None and similar_names.get('total_count') > 0:
+        most_rated = similar_names.get('items')[0]
+        search_url = f"https://github.com/search?q={repository.get('name')}%20in:name&type=repositories&s=stars&o=desc"
+        if most_rated.get('full_name') == repository.get('full_name'):
+            gx_output.r_log(f"This is the highest rating repository with name [{repository.get('name')}]", rtype="profiling")
+        else:
+            gx_output.r_log(f"WARNING: This is NOT the highest rating repository with name [{repository.get('name')}]", rtype="profiling")
+
+        if similar_names.get('total_count') > 1:
+            gx_output.r_log(f'{similar_names.get("total_count")} repositories with a similar name were discovered - See them here: {search_url}', 'profiling')
+
+    stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
+    if repository.get('stargazers_count') > 0:
+        stargazers_message += f" List at: {repository.get('stargazers_url')}"
+    gx_output.r_log(stargazers_message, rtype="profiling")
+
     if repository.get('owner'):
         gx_output.r_log(f"Repository owner account is [{repository.get('owner').get('login')}]: {repository.get('owner').get('html_url')}", rtype="profiling")
 
@@ -20,7 +39,7 @@ def run(gx_context, gx_output):
 
     # These go in the repository xray and not contributors because the REST API returns all per repository
     # https://api.github.com/repos/infobyte/faraday/issues/comments - and won't allow filtering in a helpful (to us) way
-    print(f"Getting all repository comments on commits.."+" "*40, end="")
+    print(f"\rGetting all repository comments on commits.."+" "*40, end="")
     commit_comments = gh_api.fetch_repository_commit_comments(repository)
     if len(commit_comments) > 0: 
         total_comments = defaultdict(int)
@@ -45,7 +64,7 @@ def run(gx_context, gx_output):
                 login_tmp = f"{login} [NOT a contributor]"
             else:
                 login_tmp = login
-            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Commits. Full breakdown of comments available in Verbose mode.", rtype="comments", contributor=login)
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Commits. {gx_context.verboseLegend()}", rtype="comments", contributor=login)
             #gx_output.c_log(f"{ccount} Comments added to Commits by [{login}] available at: {repository.get('url')}/comments", rtype="comments")
 
         # Not adding much value 
@@ -65,7 +84,7 @@ def run(gx_context, gx_output):
     
     print(f"\rGetting all repository comments on issues.."+" "*30, end="")
     issues_comments = gh_api.fetch_repository_issues_comments(repository)
-    if len(issues_comments) > 0: 
+    if issues_comments != None and len(issues_comments) > 0: 
         total_comments = defaultdict(int)
         positive_reactions = defaultdict(int)
         negative_reactions = defaultdict(int)
@@ -88,7 +107,7 @@ def run(gx_context, gx_output):
                 login_tmp = f"{login} [NOT a contributor]"
             else:
                 login_tmp = login
-            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Issues. Full breakdown of comments available in Verbose mode.", rtype="comments", contributor=login)
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Issues. {gx_context.verboseLegend()}", rtype="comments", contributor=login)
             #gx_output.c_log(f"{ccount} Comments added to Issues by [{login}] available at: {repository.get('url')}/issues/comments", rtype="comments")
 
         gx_output.r_log(f"{len(issues_comments)} Comments in issues available at: {repository.get('url')}/issues/comments", rtype="comments")
@@ -106,7 +125,7 @@ def run(gx_context, gx_output):
 
     print(f"\rGetting all repository comments on pull requests.."+" "*30, end="")
     pulls_comments = gh_api.fetch_repository_pulls_comments(repository)
-    if len(pulls_comments) > 0: 
+    if pulls_comments != None and len(pulls_comments) > 0: 
         total_comments = defaultdict(int)
         positive_reactions = defaultdict(int)
         negative_reactions = defaultdict(int)
@@ -129,7 +148,7 @@ def run(gx_context, gx_output):
                 login_tmp = f"{login} [NOT a contributor]"
             else:
                 login_tmp = login
-            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to PRs. Full breakdown of comments available in Verbose mode.", rtype="comments", contributor=login)
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to PRs. {gx_context.verboseLegend()}", rtype="comments", contributor=login)
             #gx_output.c_log(f"{ccount} Comments added to PRs by [{login}] available at: {repository.get('url')}/pulls/comments", rtype="comments")
 
         gx_output.r_log(f"{len(pulls_comments)} Comments in pulls available at: {repository.get('url')}/pulls/comments", rtype="comments")
@@ -163,55 +182,9 @@ def run(gx_context, gx_output):
     if repository.get('forks_count') > 0:
         gx_output.r_log(f"Repository has {repository.get('forks_count')} forks: {repository.get('forks_url')}", rtype="profiling")
 
-    print(f"\rQuerying for repository action workflows.."+" "*30, end="")
-    workflows = gh_api.fetch_repository_actions_workflows(repository)
-    if workflows != None and workflows.get('total_count') > 0:
-        gx_output.r_log(f"{workflows.get('total_count')} Workflows available at: [{repository.get('url')}/actions/workflows]", rtype="workflows")
-        for workflow in workflows.get('workflows'):
-            gx_output.r_log(f"Workflow [{workflow.get('name')}] created [{workflow.get('created_at')}], updated [{workflow.get('updated_at')}]: {workflow.get('html_url')}", rtype="workflows")
-
-        print(f"\rAnalyzing repository action workflow runs (Analysis capped to 5000 max).."+" "*30, end="")
-        # Some repositories have dozens of thousands of runs, which we could analyze Buuuut, it would take forever.
-        # Therefore we prioritize medium size repositories with < 5000 runs (as of today at least)
-        runs = gh_api.fetch_repository_actions_runs(repository, limit=5000)
-        if runs != None and runs.get('total_count') > 0:
-            gx_output.r_log(f"{workflows.get('total_count')} Workflows were run {runs.get('total_count')} times: [{repository.get('url')}/actions/runs]", rtype="workflows")
-            # Pending adding more functionality here to analyse workflow runs, although capped.
-            run_actors = defaultdict(int)
-            for run in runs.get('workflow_runs'):
-                run_actors[run.get('actor').get('login')] += 1
-
-            total_runs = int(runs.get('total_count'))
-            for actor, actor_runs in run_actors.items():
-                percentage_runs = (actor_runs / total_runs) * 100
-                if gx_context.isContributor(actor):
-                    message = f"User {actor} triggered {actor_runs} workflow runs [{percentage_runs:.2f}%] - See them at: [{repository.get('html_url')}/actions?query=actor%3A{actor}]"
-                else:
-                    message = f"WARNING: {actor} is NOT a contributor to this repository and yet triggered {actor_runs} workflow runs [{percentage_runs:.2f}%] - See them at: [{repository.get('html_url')}/actions?query=actor%3A{actor}]"
-
-                gx_output.c_log(message, rtype="workflows", contributor=actor)
-                gx_output.r_log(message, rtype="workflows")
-
-
-    print(f"\rQuerying for repository action artifacts (Analysis capped to 5000 max).."+" "*30, end="")
-    artifacts = gh_api.fetch_repository_actions_artifacts(repository, limit=5000)
-    if artifacts != None and artifacts.get('total_count') > 0:
-        gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="artifacts")
-        for artifact in artifacts.get('artifacts'):
-            # There are normally multiple artifacts hence we keep them under verbose.
-            gx_output.r_log(f"Artifact [{artifact.get('name')}] created [{artifact.get('created_at')}], updated [{artifact.get('updated_at')}]: {artifact.get('url')}", rtype="v_artifacts")
-            created_at = artifact.get('created_at')
-            created_at_ts = gh_time.parse_date(created_at)
-            updated_at = artifact.get('updated_at')
-            updated_at_ts = gh_time.parse_date(updated_at)
-            # This shouldn't happen but we still run a check; artifacts can't be updated but instead completely overwritten
-            # More data here: https://github.com/actions/upload-artifact#overwriting-an-artifact
-            if (updated_at_ts-created_at_ts).days > 0:
-                gx_output.r_log(f"WARNING: An artifact [{artifact.get('name')}] was updated {(updated_at_ts-created_at_ts).days} days after being created: {artifact.get('url')}", rtype="artifacts")
-
     print(f"\rInspecting repository branches.."+" "*40, end="")
     branches = gh_api.fetch_repository_branches(repository)
-    if len(branches) > 0: 
+    if branches != None and len(branches) > 0: 
         gx_output.r_log(f"{len(branches)} Branches available at: [{repository.get('html_url')}/branches]", rtype="branches")
         unprotected_branches = []
         protected_branches = []
@@ -226,7 +199,7 @@ def run(gx_context, gx_output):
 
     print(f"\rInspecting repository labels.."+" "*40, end="")
     labels = gh_api.fetch_repository_labels(repository)
-    if len(labels) > 0: 
+    if labels != None and len(labels) > 0: 
         gx_output.r_log(f"{len(labels)} Labels available at: [{repository.get('html_url')}/labels]", rtype="labels")
         non_default_labels = [label.get('name') for label in labels if label.get('default') == False]
         if len(non_default_labels) > 0:
@@ -234,7 +207,7 @@ def run(gx_context, gx_output):
 
     print(f"\rInspecting repository tags.."+" "*40, end="")
     tags = gh_api.fetch_repository_tags(repository)
-    if len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="tags")
+    if tags != None and len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="tags")
     tag_taggers = defaultdict(int)
 
     """ A bit shameful here because we can't really get too much data out of tags because of the way the GH API is implemented.
@@ -256,7 +229,7 @@ def run(gx_context, gx_output):
         gx_output.r_log(message, rtype="tags")
 
 
-    print(f"\rInspecting repository releases.."+" "*40)
+    print(f"\rInspecting repository releases.."+" "*40, end="")
     releases = gh_api.fetch_repository_releases(repository)
     if len(releases) > 0: gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="releases")
 
@@ -361,11 +334,6 @@ def run(gx_context, gx_output):
         watchers_message += f" List at: {repository.get('subscribers_url')}"
     gx_output.r_log(watchers_message, rtype="profiling")
 
-    stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
-    if repository.get('stargazers_count') > 0:
-        stargazers_message += f" List at: {repository.get('stargazers_url')}"
-    gx_output.r_log(stargazers_message, rtype="profiling")
-
     if repository.get('open_issues_count') > 0:
         gx_output.r_log(f"Repository has {repository.get('open_issues_count')} Open Issues: {repository.get('html_url')}/issues", rtype="profiling")
 
@@ -378,7 +346,7 @@ def run(gx_context, gx_output):
     if repository.get('fork') != False:
         parent = repository.get('parent').get('full_name')
         source = repository.get('source').get('full_name')
-        print(f"Repository is a FORK of a parent named: {repository.get('parent').get('full_name')}: {repository.get('parent')['html_url']}")
+        print(f"\rRepository is a FORK of a parent named: {repository.get('parent').get('full_name')}: {repository.get('parent')['html_url']}")
         gx_output.r_log(f"Repository is a FORK of repo: {repository.get('parent')['html_url']}", rtype="fork")
         print(f"This also means that GitHub will return ALL contributors (might be a LOT) up to the source repository")
         if parent != source:
@@ -507,5 +475,4 @@ def run(gx_context, gx_output):
     gx_output.r_log(f"The repository has no record of Issues or Pull Requests.", rtype="profiling")
     """
 
-    print(f"\rRepository has been analyzed.." + " "*40)
     return True
