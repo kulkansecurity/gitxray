@@ -20,6 +20,9 @@ class Context:
     def verboseEnabled(self):
         return self._cmd_args.verbose
 
+    def verboseLegend(self):
+        return "" if self.verboseEnabled() else "Set verbose mode for more data. "
+
     def listAndQuit(self):
         return self._cmd_args.list
 
