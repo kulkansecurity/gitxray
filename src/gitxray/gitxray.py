@@ -4,6 +4,7 @@ from gitxray.include import gh_api, gx_output as gx_output_class, gx_context as 
 from gitxray.xrays import repository_xray
 from gitxray.xrays import contributors_xray
 from gitxray.xrays import association_xray
+from gitxray.xrays import workflows_xray
 
 def gitxray_cli():
     print("""
@@ -19,7 +20,7 @@ def gitxray_cli():
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
 gitxray: X-Ray and analyze Github Repositories and their Contributors. Trust no one!
-v1.0.14 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+v1.0.15 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
@@ -71,15 +72,16 @@ v1.0.14 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by
                 if gx_context.debugEnabled():
                     print(ex)
                 sys.exit()
-
+    
             # Let's keep track of the repository that we're X-Raying
             gx_context.setRepository(repository)
 
             # Now call our xray modules! Specifically by name, until we make this more plug and play
             # The standard is that a return value of False leads to skipping additional modules
-
+    
             if not contributors_xray.run(gx_context, gx_output): continue
             if not repository_xray.run(gx_context, gx_output): continue
+            if not workflows_xray.run(gx_context, gx_output): continue
 
             # Now that we're done, let's cross reference everything in the repository.
             association_xray.run(gx_context, gx_output)
@@ -88,11 +90,13 @@ v1.0.14 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by
             gx_output.r_log(f"X-Ray on repository ended at: {r_ended_at} - {((r_ended_at-r_started_at).seconds/60):.2f} minutes elapsed", rtype="metrics")
             gx_output.doOutput()
 
+            print(f"\rRepository has been analyzed.." + " "*40)
+
             # We're resetting our context on every new repo; eventually we'll maintain a context per Org.
             gx_context.reset() 
 
     except KeyboardInterrupt:
-        gx_output.warn("\r\nReceived CTRL+C - Interrupting execution and printing all results obtained this far.")
+        gx_output.warn("\r\nMain program flow interrupted - Printing all results obtained this far.")
         gx_output.doOutput()
 
 if __name__ == "__main__":
