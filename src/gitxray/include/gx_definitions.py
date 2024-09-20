@@ -14,6 +14,30 @@ REACTIONS_POSITIVE = ['+1', 'heart']
 REACTIONS_NEGATIVE = ['-1']
 REACTIONS_NEUTRAL = ['laugh', 'hooray', 'confused', 'rocket', 'eyes']
 
+COMMIT_HOURS = {i: f"{i%12 if i%12 else 12}{'am' if i < 12 else 'pm'} UTC" for i in range(24)}
+
+# Identifies user-supplied data as per: https://securitylab.github.com/resources/github-actions-untrusted-input/
+WORKFLOWS_USER_INPUT = {
+    "Issue Title": r'\${{\s*github\.event\.issue\.title\s*}}',
+    "Issue Body": r'\${{\s*github\.event\.issue\.body\s*}}',
+    "Pull Request Title": r'\${{\s*github\.event\.pull_request\.title\s*}}',
+    "Pull Request Body": r'\${{\s*github\.event\.pull_request\.body\s*}}',
+    "Comment Body": r'\${{\s*github\.event\.comment\.body\s*}}',
+    "Review Body": r'\${{\s*github\.event\.review\.body\s*}}',
+    "Review Comment Body": r'\${{\s*github\.event\.review_comment\.body\s*}}',
+    "Page Name in Pages Event": r'\${{\s*github\.event\.pages(?:\.\w+|\[\d+\])\.page_name\s*}}',
+    "Head Commit Message": r'\${{\s*github\.event\.head_commit\.message\s*}}',
+    "Head Commit Author\'s Email": r'\${{\s*github\.event\.head_commit\.author\.email\s*}}',
+    "Head Commit Author\'s Name": r'\${{\s*github\.event\.head_commit\.author\.name\s*}}',
+    "Commit Author\'s Email": r'\${{\s*github\.event\.commits(?:\.\w+|\[\d+\])\.author\.email\s*}}',
+    "Commit Author\'s Name": r'\${{\s*github\.event\.commits(?:\.\w+|\[\d+\])\.author\.name\s*}}',
+    "Pull Request Head Ref": r'\${{\s*github\.event\.pull_request\.head\.ref\s*}}',
+    "Pull Request Head Label": r'\${{\s*github\.event\.pull_request\.head\.label\s*}}',
+    "Pull Request Default Branch": r'\${{\s*github\.event\.pull_request\.head\.repo\.default_branch\s*}}',
+    "Head Ref": r'\${{\s*github\.head_ref\s*}}',
+    "Inputs in Event": r'\${{\s*github\.event\.inputs(?:\.\w+|\[\w+\])\s*}}',
+}
+
 OPENPGP_SIG_TYPES = {
     0x00: "Signature of a binary document",
     0x01: "Signature of a canonical text document",
