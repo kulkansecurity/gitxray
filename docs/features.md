@@ -1,4 +1,4 @@
-# Awesome Features &#128171;
+# Features &#128171;
 
 Because of the amount of data it analyzes, `gitxray` can be a bit overwhelming at first. Let's look at a few examples of potential awesome findings which can better explain why you're here and why `gitxray` is awesome &hearts;. 
 
@@ -35,6 +35,10 @@ gitxray -r https://github.com/SampleOrg/SampleRepo -v -f user_input
 
 Associations MUST NOT be directly and blindly used to report fake or shadow accounts. They are automatic observations from a piece of well-intended code. Do NOT treat association results as findings directly. We must protect open-source projects by first and foremost respecting open-source developers. Ensure that any actions taken are thoughtful and based on solid evidence, not just automated associations. 
 
+## Duplicate Repository Name Check &#128737;
+
+`gitxray` will always check and detect duplicate repository names across different organizations and user profiles. This helps identify potential cloned or fake repositories. `gitxray` compares your target repository against others with the same name and the highest star count, ensuring you are engaging with the most popular (and likely legitimate) one.
+
 ## Forensics: What happened on the day of an incident? &#128269;
 
 Because `gitxray` collects data from multiple sources of activity including Commits, Comments, Workflow Runs, Issues, Deployments and more; and because Verbose mode in `gitxray` shows activity in a standarized YYYY-MM-DD format, it becomes possible to use Filtering in order to place focus on specific activity happening at a specific point in time.
@@ -45,6 +49,10 @@ For example, by running `gitxray` with the following arguments, only results fro
 gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-08
 gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-09-01
 ```
+
+## Analyzing Commit Hours to Identify Anomalies &#128347;
+
+`gitxray` provides a summary of contributor commit hours, allowing you to profile contributor activity and detect potential anomalies. This feature helps you understand typical patterns and flag unusual behavior for further investigation.
 
 ## Untrustworthy Repositories and Activity &#127988;
 
@@ -59,6 +67,22 @@ Although we always recommend running a full unfiltered verbose X-Ray, it is poss
 ``` 
 gitxray -o https://github.com/SampleOrg -v -f warning
 ```
+
+## X-Raying GitHub Workflows &#9881; 
+
+The Workflows X-Ray module is executed upon identifying existing Workflows or Actions. `gitxray` provides in-depth analysis and monitoring of GitHub workflows, including:
+
+* Execution Analysis: Provides detailed insights into workflow execution, showing how many times each workflow was executed by contributors and non-contributors. This allows for better understanding of usage patterns and detection of unauthorized or unexpected activity.
+
+* Detection of deleted runs: This feature helps identify whether workflow runs have been deleted, potentially indicating an attempt to erase traces of malicious activity or legitimate maintenance actions.
+
+* Security Checks for Workflows: Performs a series of basic security checks on workflows to identify uses of Secrets, Self-hosted Runners and Potentially dangerous triggers (eg pull_request_target) that could pose a security risk.
+
+### Disclaimer: Gitxray is NOT a complete Workflow Security Scanner
+
+For more information on tools which are specialized in scanning Workflows refer to our [Vulnerable Workflows section](vulnerable_workflows.md).
+
+
 
 ## The PR Rejection Awards &#127942; 
 
@@ -75,7 +99,7 @@ or targetting a specific Repository with (_Verbose is always optional_):
 ``` bash
 gitxray -r https://github.com/SampleOrg/SampleRepo -v -f contributors
 ```
-## Fake Stars, Private repos gone Public and more &#128584; 
+## Fake Starring, Private repos gone Public and more &#128584; 
 
 GitHub shares publicly [up to 90 days of past Events](https://docs.github.com/en/rest/activity/events?apiVersion=2022-11-28) for any User account, which include actions such as Repository creation, Watching, Committing, Pull Requesting, and more. `gitxray` summarizes these events for you and prints them out under a `90d_events` category in the results included for each Contributor, summarized in order to reduce the amount of data listed by default. 
 
@@ -98,4 +122,55 @@ And you could then enable _Verbose_ (or before, you decide) and target a specifi
 ``` 
 gitxray -r https://github.com/SampleOrg/SampleRepo -v -c some_user
 ```
+## Lots of e-mail addresses &#128231; and Profiling data &#128100;
 
+`gitxray` will report for each Contributor, an `emails` category listing all unique e-mail address collected from parsing:
+
+* The User's profile
+* Each commit made by the User
+* PGP Primary Keys and PGP SubKeys
+
+Additionally, Personal Information (e.g. social networks) voluntarily made Public by the User is extracted from multiple sources including PGP Key BLOBs and reported under a `personal` category.
+
+Finally, the `profiling` category tends to display information related to the account itself (e.g. creation date, last updated, and more.)
+
+You may focus specifically on `emails`, `personal`, and `profiling` fields with (Verbose is optional):
+```py
+gitxray -o https://github.com/SampleOrg -v -f emails,personal,profiling
+```
+or, for a specific repository, with: 
+``` py
+gitxray -r https://github.com/SampleOrg/SampleRepo -v -f emails,personal,profiling
+```
+
+## Looking out for malicious Releases and Assets &#128065; 
+
+It is possible for Threat Actors to compromise credentials of a Repository Maintainer in order to deploy malware by silently updating released Assets (the typical package you would download when a Release includes downloadable Assets); which is why `gitxray` looks at all Repository Releases and informs of:
+
+* Assets that were **updated** at least a day **AFTER** their release, which might lead to suggest they've been infected and/or tampered with. Or it could just be a maintainer fixing an asset without wanting to create a new release.
+
+* Users who have historically created releases and/or uploaded assets, as well as the % vs. the total amount of releases or assets uploaded in the repository; which may allow you to flag potential suspicious activity. For example, you might notice an account which never created Releases before now uploading assets.
+
+
+All of this information is included by `gitxray` in a `releases` category, which means you can focus on those results (if any exist) with:
+
+``` bash
+gitxray -o https://github.com/SampleOrg -f releases
+```
+
+## Anonymous contributors &#128065; 
+
+As stated in [GitHub documentation](https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-contributors), only the first 500 author email addresses in a Repository will link to actual GitHub users or accounts. The rest will appear as "anonymous" contributors without associated GitHub information.
+
+Additionally, when an author's email address in a commit is not associated with a GitHub account, the User will also be considered Anonymous.
+
+Lucky for us, `gitxray` also includes within its output the entire list of Anonymous contributors received from GitHub. The list is first processed to combine all variations of Names used by the author for a same e-mail, which means the list can also be pretty useful when, for example, executing OSINT.
+
+To filter for anonymous contributors, you may use:
+``` bash
+gitxray -o https://github.com/SampleOrg -f anonymous
+```
+
+## And so much more.
+
+We've covered a large amount of use-cases for `gitxray`, yet we're nowhere finished. Start X-Raying today your favorite Organizations and Repositories and discover more ways of connecting dots. 

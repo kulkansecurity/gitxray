@@ -1,5 +1,19 @@
 # Changelog
 
+## Release v1.0.15 (September 20th, 2024)
+
+* Added searching for similar repository names in GitHub, Warning if another repository with the same name and better reputation is found.
+* Added commit time analysis, grouping commit hours per contributor and calculating the percentage of commits at each hour. This feature provides insights into contributors' activity patterns and helps identify potential anomalies.
+* Added new Workflows X-Ray module which contains all Workflow-related logic. Moved in some of the logic that was under the Repository x-Ray.
+* Added counts of Workflow Runs to identify when Workflow Runs were DELETED, which may have been the result of an attacker erasing their tracks, or legitimate cleanup.
+* Added a series of basic Workflow security checks which might be an indicator of a vulnerable Workflow.
+* Added to the Workflows X-Ray the ability to print, for each workflow, how many times it was executed by non-contributors as well as contributors.
+* Added to the Workflows X-Ray the ability to parse and print any secret names used in a Workflow.
+* Added a display of Progress % for time consuming queries and a time estimate in seconds-left prior to resuming execution.
+* Added ability to SKIP heavy querying live by handling CTRL+C, which means we've also removed any caps or limits recently introduced.
+* Fixed parsing of dict-formatted results coming from the REST API so that we keep the last key and not the second one.
+* Fixed a few exceptions which arise by hitting CTRL+C and skipping or breaking API calls
+
 ## Release v1.0.14 (September 1st, 2024)
 
 * Added a new check on workflow runs for accounts which are NOT contributors, presenting a WARNING on screen. This could help identify hack attempts via Workflow runs.

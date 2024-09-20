@@ -7,17 +7,16 @@ The Octocat getting X-Rayed  | [![Build Workflows](https://github.com/kulkansecu
 <div style="clear: both;"></div>
 
 # What is it for?
-* [Finding sensitive information in contributor profiles](/awesome_features/#unintended-disclosures-in-contributor-profiles) disclosed by accident within, for example, Armored PGP Keys, or Key Names.
-* Identifying threat actors in a Repository. [You may spot co-owned or shared accounts](/awesome_features/#spotting-shared-co-owned-or-fake-contributors), as well as inspect public events to [spot fake Stargazers](/awesome_features/#fake-stars-private-repos-gone-public-and-more).
-* Collecting [email addresses and analyzing contributor accounts](/more_features/#lots-of-e-mail-addresses-and-profiling-data) belonging to GitHub organizations and repositories.
-* Identifying fake or infected Repositories. It can [detect tampered commit dates](/awesome_features/#untrustworthy-repositories-and-activity) as well as, for example, [Release assets updated post-release](/more_features/#looking-out-for-malicious-releases-and-assets).
-* Forensics use-cases, such as [finding out what else happened on the day of an Incident](/awesome_features/#forensics-what-happened-on-the-day-of-an-incident).
+* Identifying threat actors in a Repository. [You may spot co-owned or shared accounts](/features/#spotting-shared-co-owned-or-fake-contributors), as well as inspect public events to [spot fake Stargazers](/features/#fake-stars-private-repos-gone-public-and-more).
+* Forensics use-cases, such as [finding out what else happened on the day of an Incident](/features/#forensics-what-happened-on-the-day-of-an-incident).
+* [Finding sensitive information in contributor profiles](/features/#unintended-disclosures-in-contributor-profiles) disclosed by accident within, for example, Armored PGP Keys, or Key Names.
+* Collecting [email addresses and analyzing contributor accounts](/features/#lots-of-e-mail-addresses-and-profiling-data) belonging to GitHub organizations and repositories.
+* Identifying fake or infected Repositories. It can [detect tampered commit dates](/features/#untrustworthy-repositories-and-activity) as well as, for example, [Release assets updated post-release](/features/#looking-out-for-malicious-releases-and-assets).
 * And so. much. more.
 
 # Getting started
 * [Installing Gitxray](installing.md)
-* [Awesome Features](awesome_features.md) &#128171;
-* [More Features](more_features.md) &#129470;
+* [Features](features.md) &#128171;
 
 ## Rate Limits and the GitHub API
 

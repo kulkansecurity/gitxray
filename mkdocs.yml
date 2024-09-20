@@ -10,8 +10,9 @@ theme:
 
 nav:
   - 'installing.md'
-  - 'awesome_features.md'
-  - 'more_features.md'
+  - 'features.md'
+  - 'vulnerable_workflows.md'
+  - 'code_structure.md'
 
 markdown_extensions:
   - toc:

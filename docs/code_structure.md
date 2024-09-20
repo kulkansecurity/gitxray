@@ -23,5 +23,5 @@ Finally, last but not least important, the X-Rays under the xrays directory:
 
 * `contributors_xray.py` - Handles all Contributor-related data and decides what to log.
 * `repository_xray.py` - Handles all Repository-related data and decides what to log.
+* `workflows_xray.py` - Handles all Workflow-related analysis and decides what to log.
 * `associations_xray.py` - Analyzes and reports all associations carried from prior X-Ray modules.
-
