@@ -21,7 +21,7 @@ def run(gx_context, gx_output):
     c_anon = []
 
     c_len = len(gx_context.getContributors())
-    print(f"\rIdentified {c_len} contributors.." + ' '*40, flush=True)
+    print(f"\rIdentified {c_len} contributors.." + ' '*70, flush=True)
 
     # If focused on a contributor, let's first make sure the contributor exists in the repository
     if contributor_scope != None:
@@ -61,12 +61,12 @@ def run(gx_context, gx_output):
 
     c_users_index = 1
     for contributor in c_users:
+        if contributor is None: continue
         unique_pgp_keyids = []
         contributor_emails = []
         contributor_login = contributor.get('login')
         c_started_at = datetime.now()
         gx_output.c_log(f"X-Ray on contributor started at {c_started_at}", contributor=contributor_login, rtype="metrics")
-        commits = gh_api.fetch_commits(repository, author=contributor.get('login'))
 
         print(f"\r[{c_users_index}/{len(c_users)}] Analyzing Profile data for {contributor.get('login')}"+' '*40, end = '', flush=True)
         gx_output.c_log(f"Contributor URL: {contributor.get('html_url')}", rtype="urls")
@@ -113,7 +113,8 @@ def run(gx_context, gx_output):
         if contributor.get('site_admin') != False:
             gx_output.c_log(f"The account may be an administrator. It has 'site_admin' set to True", rtype="profiling")
 
-        if len(commits) > 0:
+        commits = gh_api.fetch_commits(repository, author=contributor.get('login'))
+        if commits != None and len(commits) > 0:
             commits_message = f", at {commits[0]['commit']['author']['date']}."
             oldest_commit = commits[-1]['commit']['author']['date']
             if len(commits) > 1:
@@ -124,6 +125,7 @@ def run(gx_context, gx_output):
         failed_verifications = []
         signature_attributes = []
         dates_mismatch_commits = []
+        commit_times = defaultdict(int)
         print(f"\r[{c_users_index}/{len(c_users)}] Analyzing {len(commits)} commits and any signing keys for {contributor.get('login')}"+' '*40, end = '', flush=True)
         for commit in commits:
             c = commit["commit"]
@@ -168,13 +170,32 @@ def run(gx_context, gx_output):
                 contributor_emails.append(c["author"]["email"]) 
                 gx_context.linkIdentifier("EMAIL", [c["author"]["email"]], contributor_login)
 
-            if gh_time.parse_date(c['author']['date']) < contributor_created_at_time:
+            commit_date = gh_time.parse_date(c['author']['date'])
+            if commit_date < contributor_created_at_time:
                 dates_mismatch_commits.append(c)
+
+            # Let's group by commit hour, we may have an insight here.
+            commit_times[commit_date.hour] += 1
 
         if len(dates_mismatch_commits) > 0:
             gx_output.c_log(f"WARNING: UNRELIABLE DATES (Older than Account) in {len(dates_mismatch_commits)} commits by [{contributor_login}]. Potential tampering, account re-use, or Rebase. List at: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
             gx_output.c_log(f"View commits with unreliable DATES here: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
             gx_context.linkIdentifier("DATE_MISMATCH_COMMITS", [len(dates_mismatch_commits)], contributor_login)
+
+        if len(commit_times) > 0:
+            # Let's link these commit hours to this contributor, and we'll do extra analysis in the associations X-Ray
+            gx_context.linkIdentifier("COMMIT_HOURS", commit_times, contributor_login)
+
+            total_commits = len(commits)
+            formatted_output = f"Commit Hours for [{total_commits}] commits:"
+            sorted_commit_times = sorted(commit_times.items(), key=lambda item: item[1], reverse=True)
+            
+            for commit_hour, count in sorted_commit_times:
+                percentage = (count / total_commits) * 100
+                range_label = gx_definitions.COMMIT_HOURS[commit_hour]
+                formatted_output += f" [{range_label}: {count} ({percentage:.2f}%)]"
+
+            gx_output.c_log(formatted_output, rtype="commits")
 
         # PGP Signature attributes: We have precise Key IDs used in signatures + details on signature creation time and algorithm
         unique_pgp_pka = set(attribute.get('pgp_publicKeyAlgorithm') for attribute in signature_attributes if attribute.get('pgp_pulicKeyAlgorithm') is not None)
@@ -284,7 +305,7 @@ def run(gx_context, gx_output):
         # SSH Signing keys 
         # https://docs.github.com/en/rest/users/ssh-signing-keys?apiVersion=2022-11-28#list-ssh-signing-keys-for-a-user
         ssh_signing_keys = gh_api.fetch_ssh_signing_keys(contributor_login)
-        if len(ssh_signing_keys) > 0:
+        if ssh_signing_keys != None and len(ssh_signing_keys) > 0:
             gx_output.c_log(f"{len(ssh_signing_keys)} SSH Keys used for Signatures in this contributor's profile", rtype="keys")
             gx_output.c_log(f"SSH Signing Keys: https://api.github.com/users/{contributor_login}/ssh_signing_keys", rtype="keys")
 
