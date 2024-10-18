@@ -3,8 +3,7 @@ Gitxray (short for Git X-Ray) is a multifaceted security tool designed for use o
 
 The Octocat getting X-Rayed  | [![Build Workflows](https://github.com/kulkansecurity/gitxray/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kulkansecurity/gitxray) [![Latest Version in PIP](https://img.shields.io/pypi/v/gitxray.svg)](https://pypi.org/project/gitxray) [![Python Versions](https://img.shields.io/pypi/pyversions/gitxray.svg)](https://pypi.org/project/gitxray) [![License](https://img.shields.io/pypi/l/gitxray.svg)](https://github.com/kulkansecurity/gitxray/blob/main/LICENSE)
 --- | ---
-![Gitxray Logo](https://kulkansecurity.github.io/gitxray/images/logo_gitxray.png "Gitxray Logo") | ![Gitxray Console](https://kulkansecurity.github.io/gitxray/images/console_gitxray.png "Gitxray Console")
-<div style="clear: both;"></div>
+![Gitxray Logo](https://kulkansecurity.github.io/gitxray/images/logo_gitxray.png "Gitxray Logo") | ![Gitxray Console](https://kulkansecurity.github.io/gitxray/images/console_gitxray.png "Gitxray Console")<br/> ![Gitxray HTML Report](images/html_report_gitxray.png "HTML Report Gitxray")<div style="clear: both;"></div>
 
 # What is it for?
 * Identifying threat actors in a Repository. [You may spot co-owned or shared accounts](/features/#spotting-shared-co-owned-or-fake-contributors), as well as inspect public events to [spot fake Stargazers](/features/#fake-stars-private-repos-gone-public-and-more).

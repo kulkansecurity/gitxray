@@ -1,13 +1,13 @@
-# Installing Gitxray
+# Installing and Updating Gitxray
 
 gitxray was written with no use of external package dependencies other than the `requests` library.
 
 ## PyPI (PIP) Way
 
-`gitxray` is on PyPI and can be installed with:
+`gitxray` is on PyPI and can be installed and updated with:
 
 ```bash
-pip install gitxray
+pip install gitxray --upgrade
 ```
 
 Once installed, simply run gitxray from your command line by typing:
@@ -18,6 +18,8 @@ or
 ```bash
 gitxray -r https://github.com/SampleOrg/SampleRepo
 ```
+
+Including https://github.com/ in the Repository or Organization is optional.
 
 ## Installing from source
 
@@ -51,13 +53,13 @@ You'll find these optional but very handy in common gitxray usage.
 
 - `-f, --filters [KEYWORDS]` - Comma-separated keywords to filter the results by, such as 'user_input', 'association', or 'mac'. **Example**: `--filters user_input,association,mac`
 
-#### Verbose and Debug
-- `-v, --verbose` - Enable verbose output which, for example, provides a detailed list of public events instead of a summary. **Example**: `--verbose`
-
-- `--debug` - Enable Debug mode for a detailed and extensive output. **Example**: `--debug`
-
 #### Output and Formats
 
 - `-out, --outfile [FILEPATH]` - Specify the file path for the output log. Cannot be a directory. **Example**: `--outfile ./output.log`
 
-- `-outformat, --output-format [FORMAT]` - Set the format for the log file. Supported formats are `text` and `json`. Default is `text`. **Example**: `--output-format json`
+- `-outformat, --output-format [FORMAT]` - Set the format for the log file. Supported formats are `html`, `text` and `json`. Default is `html`. **Example**: `--output-format json`
+
+#### Debug
+
+- `--debug` - Enable Debug mode for a detailed and extensive output. **Example**: `--debug`
+

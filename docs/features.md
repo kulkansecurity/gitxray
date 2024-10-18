@@ -2,17 +2,21 @@
 
 Because of the amount of data it analyzes, `gitxray` can be a bit overwhelming at first. Let's look at a few examples of potential awesome findings which can better explain why you're here and why `gitxray` is awesome &hearts;. 
 
+## A user-friendly HTML report &#x1F4CA;
+
+`gitxray` now offers a default output format of `html`, creating a [Bootstrap](https://www.getbootstrap.com)-backed HTML report which offers easy navigation through Repository, Contributor and non-Contributor results.<div style="clear: both;"></div> ![Gitxray HTML Report](images/html_report_gitxray.png "HTML Report Gitxray")<div style="clear: both;"></div>
+
 ## Unintended disclosures in Contributor profiles &#128064;
 
 `gitxray` reports under a `user_input` category any user-supplied data that repository Contributors may have exposed via their GitHub accounts inadevertently. This is normally the case of PGP and SSH key name fields, which unfortunately are used by Users to record hostnames, computer models, password locations (e.g. in 1Password), or even the _password itself_ to a given key (which we all know might be the same password used elsewhere). To make things more interesting, `gitxray` also identifies any "excess" data found before, or after, PGP Armored keys published in a User's GitHub account. Wondering what that data normally is? Erroneous copy/pastes from the command line while exporting in ASCII/Armored format their keys. And what might that contain? Most of the times, a shell prompt revealing a local username, a hostname and a directory path. May I remind you all of this data is Public-facing.
 
 You may focus specifically on these types of findings by filtering results with:
 ```py
-gitxray -o https://github.com/SampleOrg -v -f user_input
+gitxray -o https://github.com/SampleOrg -f user_input
 ```
-or, for a specific repository (remember, _Verbose is always optional_): 
+or, for a specific repository:
 ``` py
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -f user_input
+gitxray -r https://github.com/SampleOrg/SampleRepo -f user_input
 ```
 
 ## Spotting shared, co-owned or fake Contributors &#128123;
@@ -24,11 +28,11 @@ Open source projects are under attack, with malicious actors hiding in plain sig
 You can focus specifically on association findings by filtering for `association` with:
 
 ``` 
-gitxray -o https://github.com/SampleOrg -v -f user_input
+gitxray -o https://github.com/SampleOrg -f association 
 ```
-or targetting a specific Repository with (_Verbose is always optional_):
+or targetting a specific Repository with:
 ```
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -f user_input
+gitxray -r https://github.com/SampleOrg/SampleRepo -f association
 ```
 
 ### Important 
@@ -41,14 +45,16 @@ Associations MUST NOT be directly and blindly used to report fake or shadow acco
 
 ## Forensics: What happened on the day of an incident? &#128269;
 
-Because `gitxray` collects data from multiple sources of activity including Commits, Comments, Workflow Runs, Issues, Deployments and more; and because Verbose mode in `gitxray` shows activity in a standarized YYYY-MM-DD format, it becomes possible to use Filtering in order to place focus on specific activity happening at a specific point in time.
+Because `gitxray` collects data from multiple sources of activity including Commits, Comments, Workflow Runs, Issues, Deployments and more; and because `gitxray` shows activity in a standarized YYYY-MM-DD format, it becomes possible to use Filtering in order to place focus on specific activity happening at a specific point in time.
 
 For example, by running `gitxray` with the following arguments, only results from that specific date are returned. You may place focus on a day, or even a month:
 
 ``` 
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-08
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-09-01
+gitxray -r https://github.com/SampleOrg/SampleRepo -f 2024-08 -outformat text
+gitxray -r https://github.com/SampleOrg/SampleRepo -f 2024-09-01 -outformat text
 ```
+
+An outformat of type `text` can help in this specific use-case more than the defaul `html` report.
 
 ## Analyzing Commit Hours to Identify Anomalies &#128347;
 
@@ -62,10 +68,10 @@ gitxray -r https://github.com/SampleOrg/SampleRepo -v -f 2024-09-01
 
 * Reclaimed Usernames: Trusted contributors might have had their accounts deleted and then re-registered by malicious actors. GitHub allows a username to be re-released after 90 days, making this a possible attack vector. Learn more about GitHub’s account deletion policy [here](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-personal-account/deleting-your-personal-account#deleting-your-personal-account).
 
-Although we always recommend running a full unfiltered verbose X-Ray, it is possible to focus on unreliable historic activity by filtering for Warning keywords:
+It is possible to focus on unreliable historic activity by filtering for Warning keywords:
 
 ``` 
-gitxray -o https://github.com/SampleOrg -v -f warning
+gitxray -o https://github.com/SampleOrg -f warning
 ```
 
 ## X-Raying GitHub Workflows &#9881; 
@@ -93,17 +99,15 @@ Another `gitxray` feature is the ability to list a TOP 3 of GitHub accounts that
 These findings, if any exist, are reported under a `contributors` category along with additional information related to other Repository Contributors. You can focus specifically on findings from the contributors category by filtering for `contributors` with:
 
 ``` 
-gitxray -o https://github.com/SampleOrg -v -f contributors 
+gitxray -o https://github.com/SampleOrg -f contributors 
 ```
-or targetting a specific Repository with (_Verbose is always optional_):
+or targetting a specific Repository with:
 ``` bash
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -f contributors
+gitxray -r https://github.com/SampleOrg/SampleRepo -f contributors
 ```
 ## Fake Starring, Private repos gone Public and more &#128584; 
 
-GitHub shares publicly [up to 90 days of past Events](https://docs.github.com/en/rest/activity/events?apiVersion=2022-11-28) for any User account, which include actions such as Repository creation, Watching, Committing, Pull Requesting, and more. `gitxray` summarizes these events for you and prints them out under a `90d_events` category in the results included for each Contributor, summarized in order to reduce the amount of data listed by default. 
-
-The summary however can be expanded into a full list of Events by merely turning on _Verbose mode_ (the -v flag). Using _Verbose mode_ is convenient in order to get details on **WHAT** was actioned upon.
+GitHub shares publicly [up to 90 days of past Events](https://docs.github.com/en/rest/activity/events?apiVersion=2022-11-28) for any User account, which include actions such as Repository creation, Watching, Committing, Pull Requesting, and more. `gitxray` includes these events under a `90d_events` category in the results included for each Contributor.
 
 For example, Events you may come across that would be interesting include:
 
@@ -118,9 +122,9 @@ To find Contributors who recently switched from Private to Public a repository o
 gitxray -o https://github.com/SampleOrg -f starred,private
 ```
 
-And you could then enable _Verbose_ (or before, you decide) and target a specific Repository Contributor to get more information:
+And you could then target a specific Repository Contributor to get more information:
 ``` 
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -c some_user
+gitxray -r https://github.com/SampleOrg/SampleRepo -c some_user
 ```
 ## Lots of e-mail addresses &#128231; and Profiling data &#128100;
 
@@ -134,13 +138,13 @@ Additionally, Personal Information (e.g. social networks) voluntarily made Publi
 
 Finally, the `profiling` category tends to display information related to the account itself (e.g. creation date, last updated, and more.)
 
-You may focus specifically on `emails`, `personal`, and `profiling` fields with (Verbose is optional):
+You may focus specifically on `emails`, `personal`, and `profiling` fields with:
 ```py
-gitxray -o https://github.com/SampleOrg -v -f emails,personal,profiling
+gitxray -o https://github.com/SampleOrg -f emails,personal,profiling
 ```
 or, for a specific repository, with: 
 ``` py
-gitxray -r https://github.com/SampleOrg/SampleRepo -v -f emails,personal,profiling
+gitxray -r https://github.com/SampleOrg/SampleRepo -f emails,personal,profiling
 ```
 
 ## Looking out for malicious Releases and Assets &#128065; 

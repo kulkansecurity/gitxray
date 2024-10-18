@@ -1,5 +1,12 @@
 # Changelog
 
+## Release v1.0.16 (October 18th, 2024)
+* Added a brand new HTML output format/report by default, making results a lot easier to navigate! Custom search bar instead of relying on DataTables which can be super slow for large HTML files. We're now also groupping results by Category across all contributors and highlighting results which contain a WARNING keyword.
+* Added certain association results to Contributor results, not all to prevent extra noise.
+* Added the ability to specify a directory for output instead of a file, gitxray creating the filename for you.
+* Removed the concept of 'Verbose' results, merging them with the non-verbose categories.
+* Removed the need for repositories and organizations to start with https://github.com (Thanks to @mattaereal for pointing that out!)
+
 ## Release v1.0.15 (September 20th, 2024)
 
 * Added searching for similar repository names in GitHub, Warning if another repository with the same name and better reputation is found.

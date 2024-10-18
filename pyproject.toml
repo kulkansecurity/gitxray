@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gitxray"
-version = "1.0.15"
+version = "1.0.16"
 authors = [
   { name="Lucas Lavarello", email="llavarello@kulkan.com" },
 ]
@@ -28,3 +28,6 @@ Issues = "https://github.com/kulkansecurity/gitxray/issues"
 
 [project.scripts]
 gitxray = "gitxray.gitxray:gitxray_cli"
+
+[tool.setuptools.package-data]
+"gitxray" = ["include/html_report/*.html"]
