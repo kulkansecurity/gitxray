@@ -87,7 +87,11 @@ def parse_openpgp_fields(decoded_data):
                     offset += 2
                     userid_length = decoded_data[offset]
                     offset += 1 
-                    attributes['userId'] = decoded_data[offset:offset+userid_length].decode('utf-8')
+                    userId = decoded_data[offset:offset+userid_length]
+                    try: # ugly temporary fix for encodings in userId
+                        attributes['userId'] = userId.decode('utf-8')
+                    except: # some exceptional cases appear to be triggering exceptions
+                        attributes['userId'] = userId
                     
 
         else:
@@ -122,7 +126,13 @@ def ugly_inhouse_openpgp_block(pgp_armored_input):
 
     decoded_blob = base64.b64decode(base64_str.encode('ascii', 'ignore'))
 
-    openpgp_findings = parse_openpgp_fields(decoded_blob)
+    try:
+        openpgp_findings = parse_openpgp_fields(decoded_blob)
+    except Exception as ex:
+        print(f"Exception triggered in parse_openpgp_fields")
+        print(f"Printing base64 blob contents for debugging purposes.")
+        print(base64_str)
+        raise ex
 
     # Add any comment and version values from the armored ascii to our findings.
     version_match = re.search(r'Version: (.+)\r?\n?', pgp_armored_input)
