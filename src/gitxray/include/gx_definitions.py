@@ -16,6 +16,32 @@ REACTIONS_NEUTRAL = ['laugh', 'hooray', 'confused', 'rocket', 'eyes']
 
 COMMIT_HOURS = {i: f"{i%12 if i%12 else 12}{'am' if i < 12 else 'pm'} UTC" for i in range(24)}
 
+# For the HTML output format
+HTML_REPORT_EMOJIS = {
+    "metrics": "&#128200;",
+    "urls": "&#127760;",
+    "personal": "&#127380;",
+    "emails": "&#9993;",
+    "profiling": "&#128373;",
+    "commits": "&#128229;",
+    "keys": "&#128273;",
+    "user_input": "&#9000;",
+    "90d_events": "&#128467;",
+    "releases": "&#128640;",
+    "contributors": "&#128101;",
+    "labels": "&#128278;",
+    "comments": "&#128172;",
+    "deployments": "&#128736;",
+    "environments": "&#127757;",
+    "branches": "&#127807;",
+    "tags": "&#127991;",
+    "workflows": "&#128421;",
+    "artifacts": "&#128230;",
+    "signatures": "&#9997;",
+    "association": "&#129309;",
+    "prs": "&#128256;"
+}
+
 # Identifies user-supplied data as per: https://securitylab.github.com/resources/github-actions-untrusted-input/
 WORKFLOWS_USER_INPUT = {
     "Issue Title": r'\${{\s*github\.event\.issue\.title\s*}}',
