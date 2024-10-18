@@ -20,7 +20,7 @@ def gitxray_cli():
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
 gitxray: X-Ray and analyze Github Repositories and their Contributors. Trust no one!
-v1.0.15 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+v1.0.16 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
@@ -37,8 +37,13 @@ v1.0.15 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by
     else:
         gx_output.notify(f"GitHub Token loaded from {gx_definitions.ENV_GITHUB_TOKEN} env variable.")
 
-    if not gx_context.verboseEnabled():
-        gx_output.notify(f"Verbose mode is DISABLED. You might want to use -v if you're hungry for information.")
+    gx_output.notify(f"Output format set to [{gx_context.getOutputFormat().upper()}] - You may change it with -outformat.")
+
+    if gx_context.getOutputFile():
+        gx_output.notify(f"Output file set to: {str(gx_context.getOutputFile())} - You may change it with -out.")
+        if gx_context.getOrganizationTarget():
+            # Let's warn the user that in Organization mode, the output file will contain a repository name preffix
+            gx_output.warn("The Output file name when targetting an Organization will include an Organization and Repository prefix.")
 
     if gx_context.getOutputFilters():
         gx_output.notify(f"You have ENABLED filters - You will only see results containing the following keywords: {str(gx_context.getOutputFilters())}")
@@ -75,6 +80,9 @@ v1.0.15 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by
     
             # Let's keep track of the repository that we're X-Raying
             gx_context.setRepository(repository)
+
+            # if an Organization is in target, add a repository prefix to the output filename
+            if gx_context.getOrganizationTarget() and gx_context.getOutputFile(): gx_context.setOutputFilePrefix(repository.get("full_name"))
 
             # Now call our xray modules! Specifically by name, until we make this more plug and play
             # The standard is that a return value of False leads to skipping additional modules

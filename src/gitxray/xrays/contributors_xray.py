@@ -354,7 +354,7 @@ def run(gx_context, gx_output):
             gx_output.c_log(f"Contributor has {len(failed_verifications)} failed attempts at signing commits and 0 succesful commits signed out of their {len(commits)} total commits.", rtype="signatures")
 
         if len(signed_commits) > 0 and len(signed_commits) < len(commits):
-            gx_output.c_log(f"Contributor has a mix of {len(signed_commits)} signed vs. {len(commits)-len(signed_commits)} unsigned commits (in this repo).", rtype="commits")
+            gx_output.c_log(f"Contributor has a mix of {len(signed_commits)} signed vs. {len(commits)-len(signed_commits)} unsigned commits (in this repo).", rtype="signatures")
 
         for scommit in signed_commits: 
             if scommit['verification']['reason'] != 'valid': print(scommit) # This shouldn't happen

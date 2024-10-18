@@ -31,9 +31,8 @@ def run(gx_context, gx_output):
                     max_run = max(run_numbers)
                     missing_numbers = sorted(set(range(min_run, max_run+1)) - set(run_numbers))
                     if len(missing_numbers) > 0: 
-                        gx_output.r_log(f"Workflow [{workflow.get('name')}] has [{len(missing_numbers)}] missing or deleted runs. This could have been an attacker erasing their tracks, or legitimate cleanup. {gx_context.verboseLegend()}", rtype="workflows")
-                        if gx_context.verboseEnabled():
-                            gx_output.r_log(f"Missing run numbers for Workflow [{workflow.get('name')}]: {missing_numbers}", rtype="v_workflows")
+                        gx_output.r_log(f"Workflow [{workflow.get('name')}] has [{len(missing_numbers)}] missing or deleted runs. This could have been an attacker erasing their tracks, or legitimate cleanup.", rtype="workflows")
+                        gx_output.r_log(f"Missing run numbers for Workflow [{workflow.get('name')}]: {missing_numbers}", rtype="workflows")
 
                 total_runs = int(runs.get('total_count'))
                 for actor, actor_runs in run_actors.items():
@@ -45,15 +44,15 @@ def run(gx_context, gx_output):
                         run_non_contributors[actor] += 1
                         message = f"{actor} is NOT a contributor and ran {actor_runs} [{percentage_runs:.2f}%] times workflow [{workflow.get('name')}] - See them at: [{repository.get('html_url')}/actions?query=actor%3A{actor}]"
 
-                    gx_output.c_log(message, rtype="v_workflows", contributor=actor)
-                    gx_output.r_log(message, rtype="v_workflows")
+                    gx_output.c_log(message, rtype="workflows", contributor=actor)
+                    gx_output.r_log(message, rtype="workflows")
           
                 if len(run_non_contributors) > 0 or len(run_contributors) > 0: 
                     all_non_c_runners = len(run_non_contributors.keys())
                     all_non_c_runs = sum(run_non_contributors.values())
                     all_c_runners = len(run_contributors.keys())
                     all_c_runs = sum(run_contributors.values())
-                    gx_output.r_log(f"Workflow [{workflow.get('name')}] was run by [{all_non_c_runners}] NON-contributors [{all_non_c_runs}] times and by [{all_c_runners}] contributors [{all_c_runs}] times. {gx_context.verboseLegend()}[{repository.get('html_url')}/actions/workflows/{workflow_file}]", rtype="workflows")
+                    gx_output.r_log(f"Workflow [{workflow.get('name')}] was run by [{all_non_c_runners}] NON-contributors [{all_non_c_runs}] times and by [{all_c_runners}] contributors [{all_c_runs}] times. [{repository.get('html_url')}/actions/workflows/{workflow_file}]", rtype="workflows")
 
             contents = gh_api.fetch_repository_file_contents(repository, workflow.get('path'))
             if contents.get('content') != None:
@@ -90,8 +89,7 @@ def run(gx_context, gx_output):
     if artifacts != None and artifacts.get('total_count') > 0:
         gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="artifacts")
         for artifact in artifacts.get('artifacts'):
-            # There are normally multiple artifacts hence we keep them under verbose.
-            gx_output.r_log(f"Artifact [{artifact.get('name')}] created [{artifact.get('created_at')}], updated [{artifact.get('updated_at')}]: {artifact.get('url')}", rtype="v_artifacts")
+            gx_output.r_log(f"Artifact [{artifact.get('name')}] created [{artifact.get('created_at')}], updated [{artifact.get('updated_at')}]: {artifact.get('url')}", rtype="artifacts")
             created_at = artifact.get('created_at')
             created_at_ts = gh_time.parse_date(created_at)
             updated_at = artifact.get('updated_at')

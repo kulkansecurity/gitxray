@@ -33,7 +33,7 @@ def log_events(events, gx_output, for_repository=False):
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#commitcommentevent
         if etype == "CommitCommentEvent":
-                logging_func(f"{ts}: {actor}created a comment in a commit: [{payload.get('comment').get('html_url')}]", rtype="v_90d_events")
+                logging_func(f"{ts}: {actor}created a comment in a commit: [{payload.get('comment').get('html_url')}]", rtype="90d_events")
                 pass
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#createeventA
@@ -41,71 +41,68 @@ def log_events(events, gx_output, for_repository=False):
         elif etype == "CreateEvent" or etype == "DeleteEvent":
             action = "created" if etype == "CreateEvent" else "deleted"
             if payload.get('ref_type') == "repository":
-                logging_func(f"{ts}: {actor}{action} a repository: [{event.get('repo').get('name')}]", rtype="v_90d_events")
+                logging_func(f"{ts}: {actor}{action} a repository: [{event.get('repo').get('name')}]", rtype="90d_events")
             else:
-                logging_func(f"{ts}: {actor}{action} a {payload.get('ref_type')}: [{payload.get('ref')}] in repo [{event.get('repo').get('name')}]", rtype="v_90d_events")
+                logging_func(f"{ts}: {actor}{action} a {payload.get('ref_type')}: [{payload.get('ref')}] in repo [{event.get('repo').get('name')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#forkevent
         elif etype == "ForkEvent":
-            logging_func(f"{ts}: {actor}forked a repository: {event.get('repo').get('name')} into {payload.get('forkee').get('full_name')}", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}forked a repository: {event.get('repo').get('name')} into {payload.get('forkee').get('full_name')}", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#gollumevent
         elif etype == "GollumEvent":
             for page in payload.get('pages'):
-                logging_func(f"{ts}: {actor}{page.get('action')} Wiki page at [{page.get('html_url')}]", rtype="v_90d_events")
+                logging_func(f"{ts}: {actor}{page.get('action')} Wiki page at [{page.get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#issuecommentevent
         elif etype == "IssueCommentEvent":
-            logging_func(f"{ts}: {actor}{action} a comment in an Issue [{payload.get('issue').get('html_url')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} a comment in an Issue [{payload.get('issue').get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#issuesevent
         elif etype == "IssuesEvent":
-                logging_func(f"{ts}: {actor}{action} an Issue: [{payload.get('issue').get('html_url')}]", rtype="v_90d_events")
+                logging_func(f"{ts}: {actor}{action} an Issue: [{payload.get('issue').get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#memberevent
         elif etype == "MemberEvent":
             added_who = payload.get('member').get('login')
             to_repo = event.get('repo').get('name')
-            logging_func(f"{ts}: {actor}{action} a user [{added_who}] as a collaborator to repo: [{to_repo}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} a user [{added_who}] as a collaborator to repo: [{to_repo}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#publicevent
         elif etype == "PublicEvent":
-            logging_func(f"{ts}: {actor}switched a repository from PRIVATE to PUBLIC, repo: [{event.get('repo').get('name')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}switched a repository from PRIVATE to PUBLIC, repo: [{event.get('repo').get('name')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#pullrequestevent
         elif etype == "PullRequestEvent":
-            logging_func(f"{ts}: {actor}{action} a PR: [{payload.get('pull_request').get('html_url')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} a PR: [{payload.get('pull_request').get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#pullrequestreviewevent
         elif etype == "PullRequestReviewEvent":
-            logging_func(f"{ts}: {actor}{action} a PR Review: [{payload.get('pull_request').get('html_url')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} a PR Review: [{payload.get('pull_request').get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#pullrequestreviewcommentevent
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#pullrequestreviewthreadevent
         elif etype == "PullRequestReviewCommentEvent" or etype == "PullRequestReviewThreadEvent":
-            logging_func(f"{ts}: {actor}{action} a comment in PR: [{payload.get('pull_request').get('html_url')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} a comment in PR: [{payload.get('pull_request').get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#pushevent
         elif etype == "PushEvent":
-            logging_func(f"{ts}: {actor}pushed a total of {len(payload.get('commits'))} commits from: [{payload.get('ref')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}pushed a total of {len(payload.get('commits'))} commits from: [{payload.get('ref')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#releaseevent
         elif etype == "ReleaseEvent":
-            logging_func(f"{ts}: {actor}published a Release at [{payload.get('release').get('html_url')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}published a Release at [{payload.get('release').get('html_url')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#sponsorshipevent
         elif etype == "SponsorshipEvent":
-            logging_func(f"{ts}: {actor}{action} a Sponsorship Event]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}{action} a Sponsorship Event]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#watchevent
         elif etype == "WatchEvent":
-            logging_func(f"{ts}: {actor}starred a repository: [{event.get('repo').get('name')}]", rtype="v_90d_events")
+            logging_func(f"{ts}: {actor}starred a repository: [{event.get('repo').get('name')}]", rtype="90d_events")
         else:
             logging_func(f"Missing parser in recent events for: {etype} with {payload}", rtype="debug")
 
-
-    # If verbose is enabled, we skip the summary as it becomes redundant.
-    if gx_output.verbose_enabled(): return 
 
     # Now let's create the non-debug summarized version of messages.
     for (month, etype, action), count in event_summary.items():
@@ -196,5 +193,4 @@ def log_events(events, gx_output, for_repository=False):
 
 
         logging_func(summary_message, rtype="90d_events")
-    logging_func("For a detailed individual list of recent public events, use --verbose", rtype="90d_events")
     return

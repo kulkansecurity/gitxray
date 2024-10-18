@@ -1,6 +1,6 @@
 from . import gx_arg_parser, gx_definitions
 from collections import defaultdict
-import os
+import os, re
 
 class Context:
     def __init__(self):
@@ -10,6 +10,7 @@ class Context:
 
     def reset(self):
         self._identifier_user_relationship = defaultdict(list)
+        self._outfile_prefix = None
 
     def usingToken(self):
         return self._USING_TOKEN != None
@@ -17,20 +18,26 @@ class Context:
     def debugEnabled(self):
         return self._cmd_args.debug
 
-    def verboseEnabled(self):
-        return self._cmd_args.verbose
-
-    def verboseLegend(self):
-        return "" if self.verboseEnabled() else "Set verbose mode for more data. "
-
     def listAndQuit(self):
         return self._cmd_args.list
 
     def getOutputFile(self):
-        return self._cmd_args.outfile
+        outfile = self._cmd_args.outfile
+        if self._outfile_prefix:
+            directory, filename = os.path.split(outfile)
+            slug = re.sub(r'[^A-Za-z0-9_]', '_', self._outfile_prefix)
+            slug = re.sub(r'_+', '_', slug).strip('_')
+            prefixed_filename = f'{slug}_{filename}'
+            return os.path.join(directory, prefixed_filename)
+    
+        return outfile
+
+    def setOutputFilePrefix(self, prefix):
+        self._outfile_prefix = prefix
+        return
 
     def getOutputFormat(self):
-        return self._cmd_args.output_format if self._cmd_args.output_format is not None else "text"
+        return self._cmd_args.output_format if self._cmd_args.output_format is not None else "html"
 
     def getOutputFilters(self):
         return self._cmd_args.filters

@@ -1,5 +1,5 @@
 # Our argparser is called by the Gitxray Context, we don't talk to it directly.
-import os, sys, argparse, re
+import os, sys, argparse, re, datetime
 
 def parse_repositories_from_file(filepath):
     if not os.path.exists(filepath):
@@ -16,7 +16,7 @@ def parse_repositories_from_file(filepath):
 
 def validate_repository_org_link(repo):
     if not repo.startswith("https://"):
-        raise argparse.ArgumentTypeError(f"Invalid URL '{repo}'. It should start with 'https://'.")
+        return f'https://github.com/{repo}'
     return repo
 
 def validate_contributors(username_string):
@@ -39,7 +39,7 @@ def parse_arguments():
     group.add_argument('-r', '--repository',
             type=validate_repository_org_link,
             action='store',
-            help='The repository to check (an https:// URL)')
+            help='The repository to check (Including https://github.com/ is optional)')
 
     group.add_argument('-rf', '--repositories-file',
             type=parse_repositories_from_file,
@@ -49,7 +49,7 @@ def parse_arguments():
     group.add_argument('-o', '--organization',
             type=validate_repository_org_link,
             action='store',
-            help='An organization to check all of their repositories (an https:// URL)')
+            help='An organization to check all of their repositories (Including https://github.com/ is optional)')
 
     group_two = parser.add_mutually_exclusive_group(required=False)
 
@@ -68,11 +68,6 @@ def parse_arguments():
             action='store',
             help="Comma separated keywords to filter results by (e.g. private,macbook).")
 
-    parser.add_argument('-v', '--verbose',
-            action='store_true', 
-            default=False, 
-            help='Verbose output. For example, print a detailed list of public events instead of a summary.')
-
     parser.add_argument('--debug', 
             action='store_true', 
             default=False, 
@@ -84,16 +79,20 @@ def parse_arguments():
             help='Set the location for the output log file.')
 
     parser.add_argument('-outformat', '--output-format', type=str, action='store',
-            default='text',
-            help='Format for log file (text,json) - default: text',
-            choices = ['text', 'json'])
+            default='html',
+            help='Format for log file (html,text,json) - default: html',
+            choices = ['html', 'text', 'json'])
 
     args = parser.parse_args()
 
+    # If output format is 'html' and outfile is not specified, set it to current date and time
+    current_datetime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    if args.output_format == 'html' and not args.outfile:
+        args.outfile = f"gitxray_{current_datetime}.html"
+
     if args.outfile:
         if os.path.isdir(args.outfile):
-            print("[!] Can't specify a directory as the output file, exiting.")
-            sys.exit()
+            args.outfile = f"{args.outfile}gitxray_{current_datetime}.html"
         if os.path.isfile(args.outfile):
             target = args.outfile
         else:

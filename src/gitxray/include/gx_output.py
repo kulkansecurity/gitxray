@@ -1,4 +1,5 @@
-import json, random
+import json, random, os, html, re, datetime, sys
+from collections import defaultdict
 from . import gx_definitions
 
 class Output:
@@ -8,17 +9,15 @@ class Output:
     def __init__(self, gx_context, outfile=None, outformat='text'):
 
         self._debug = gx_context.debugEnabled()
-        self._verbose = gx_context.verboseEnabled() or self._debug 
 
-        self._outfile = None
-        # We're appenders, we're not destroyers.
-        if gx_context.getOutputFile(): self._outfile = open(gx_context.getOutputFile(), 'a+')
         self._outformat = gx_context.getOutputFormat()
 
         self._filters = gx_context.getOutputFilters()
         self._rtype_color_map = {}
 
         self._cscope = gx_context.getContributorScope() 
+
+        self._gxcontext = gx_context
 
         self.reset()
 
@@ -69,9 +68,6 @@ class Output:
     def debug_enabled(self):
         return self._debug
    
-    def verbose_enabled(self):
-        return self._verbose
-
     # Direct output, not really waiting for results to print this out.
     def warn(self, message):
         colored_message = f"{self.ANSI_COLORS['YELLOW']}{message}{self.ANSI_COLORS['RESET']}"
@@ -108,8 +104,6 @@ class Output:
             for rtype in data.keys():
                 if not self.debug_enabled() and ("debug" in rtype.lower()):
                     continue
-                if not self.verbose_enabled() and ("v_" in rtype.lower()):
-                    continue
 
                 random_color = "" if skip_ansi else (self.get_rtype_color(rtype) if data_source != self._anonymous else temp_colors.get('BLUE',''))
                 formatted_rtype = f"[{rtype}]:".ljust(max_rtype_length + 1)
@@ -131,13 +125,10 @@ class Output:
                 output += "".join(result_lines)
 
             else:
-                if self.verbose_enabled():
-                    output += f"#" * gx_definitions.SCREEN_SEPARATOR_LENGTH + "\n"
-                    output += f"No results to show for {entity_string}.".replace("ENTITY_STR", entity)
-                    if self._filters: output += f" Try removing filters."
-                    output += "\n"
-                else:
-                    no_results.append(entity)
+                output += f"#" * gx_definitions.SCREEN_SEPARATOR_LENGTH + "\n"
+                output += f"No results to show for {entity_string}.".replace("ENTITY_STR", entity)
+                if self._filters: output += f" Try removing filters."
+                output += "\n"
 
         if len(no_results) > 0:
             output += f"#" * gx_definitions.SCREEN_SEPARATOR_LENGTH + "\n"
@@ -145,8 +136,200 @@ class Output:
             
         return output
 
-    def _create_text_output(self, outfile):
-        skip_ansi = outfile != None
+
+    def html_data_sanitize_and_process(self, text):
+        # html.escape already escapes { and } to prevent expression injection
+        sanitized_text = html.escape(text, quote=True)
+
+        # New pattern to match URLs both inside and outside of brackets
+        url_pattern = re.compile(r'\[(https?://[^\s\]]+)\]|\b(https?://[^\s]+)')
+    
+        # Function to handle matching groups
+        def replace_url(match):
+            url = match.group(1) or match.group(2)
+            return f'<a href="{url}" target="_blank">{url}</a>'
+
+        # Substitute using the custom function
+        clickable_text = url_pattern.sub(replace_url, sanitized_text)
+        return clickable_text
+
+    def _create_html_output(self):
+        TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "html_report")
+
+        # Load all template files
+        templates = {
+            name: open(os.path.join(TEMPLATE_DIR, f"template_{name}.html"), "r", encoding="utf-8").read()
+            for name in ["main", "repository", "contributor", "non_contributor", "table"]
+        }
+
+        category_sections = ""
+        contributor_sections = ""
+        more_sections = ""
+        repository_sections = ""
+        repository_sidebar_links = ""
+        contributor_sidebar_links = ""
+        category_sidebar_links = ""
+        more_sidebar_links = ""
+
+        for entity, data in self._repositories.items():
+            sanitized_entity = self.html_data_sanitize_and_process(entity)
+            r_template = templates['repository'].replace("{{repository_id}}", str(sanitized_entity))
+
+            r_tables = []
+            r_sidebar_links = []
+            for rtype in data.keys():
+                if not self.debug_enabled() and ("debug" in rtype.lower()): continue
+                data_rows = []
+                for line in data[rtype]:
+                    if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {line.lower()}' for f in self._filters)): continue
+                    data_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
+
+                if len(data_rows) > 0:
+                    r_sidebar_links.append('<li class="nav-item"><a class="nav-link" href="#repository_'+str(sanitized_entity)+'_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li>')
+                    r_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "repository_"+str(sanitized_entity)+"_"+rtype))
+
+            if len(r_tables) > 0:
+                repository_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128193;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                repository_sidebar_links += "".join(r_sidebar_links)
+                repository_sidebar_links += '</ul></div></li></ul>'
+                r_template = r_template.replace("{{repository_tables}}", "".join(r_tables))
+                repository_sections += r_template
+            else:
+                repository_sections += "<h5>No Results</h5>"
+
+
+        # We now merge all rtypes across all contributor results
+        tables_by_rtype = {}
+        for entity, data in self._contributors.items():
+            # Skip non-contributors
+            if not self._gxcontext.isContributor(entity): continue
+            
+            sanitized_entity = self.html_data_sanitize_and_process(entity)
+            
+            # Loop through all rtypes for the current contributor
+            for rtype in data.keys():
+                if not self.debug_enabled() and ("debug" in rtype.lower()): continue
+                
+                if rtype not in tables_by_rtype:
+                    tables_by_rtype[rtype] = ""
+
+                for line in data[rtype]:
+                    tables_by_rtype[rtype] += f"<tr><td><a href='#contributor-section-{sanitized_entity}'>{sanitized_entity}</a></td><td>{self.html_data_sanitize_and_process(line)}</td></tr>"
+
+        for rtype, table_rows in tables_by_rtype.items():
+            if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {table_rows.lower()}' for f in self._filters)): continue
+            category_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a href="#nav_category_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li></ul>'
+            table_html = templates['table'].replace("{{table_rows}}", table_rows) \
+                                       .replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype, '')}") \
+                                       .replace("{{table_id}}", f"nav_category_{rtype}")
+            category_sections += table_html
+
+
+        for entity, data in self._contributors.items():
+            # In the HTML report we skip any non-contributor results when showing contributor results
+            if not self._gxcontext.isContributor(entity): 
+                continue
+
+            sanitized_entity = self.html_data_sanitize_and_process(entity)
+            c_template = templates['contributor'].replace("{{contributor_id}}", str(sanitized_entity))
+            c_template = c_template.replace("{{contributor_name}}", str(sanitized_entity) + "&#128193;")
+
+            c_tables = []
+            c_sidebar_links = []
+            for rtype in data.keys():
+                if not self.debug_enabled() and ("debug" in rtype.lower()): continue
+                data_rows = []
+                for line in data[rtype]:
+                    if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {line.lower()}' for f in self._filters)): continue
+                    data_rows.append(f"<tr><td>{sanitized_entity}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
+
+                if len(data_rows) > 0:
+                    c_sidebar_links.append('<li class="nav-item"><a class="nav-link" href="#contributor_'+str(sanitized_entity)+'_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li>')
+                    c_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "contributor_"+str(sanitized_entity)+"_"+str(rtype)))
+
+            if len(c_tables) > 0:
+                contributor_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128193;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                contributor_sidebar_links += "".join(c_sidebar_links)
+                contributor_sidebar_links += '</ul></div></li></ul>'
+                c_template = c_template.replace("{{contributor_tables}}", "".join(c_tables))
+                contributor_sections += c_template
+
+        if len(self._anonymous) > 0 and len(next(iter(self._anonymous.values()))) > 1:
+            for entity, data in self._anonymous.items():
+                sanitized_entity = "Anonymous"
+                a_template = templates['non_contributor'].replace("{{non_contributor_id}}", str(sanitized_entity))
+                a_template = a_template.replace("{{non_contributor_name}}", f'{sanitized_entity} &#128123;')
+                more_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128123;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                a_tables = ""
+                for rtype in data.keys():
+                    data_rows = []
+                    for line in data[rtype]:
+                        if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {line.lower()}' for f in self._filters)): continue
+                        data_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
+
+                    if len(data_rows) > 0:
+                        more_sidebar_links += '<li class="nav-item"><a class="nav-link" href="#contributor_'+str(sanitized_entity)+'_'+str(rtype)+'">'+str(rtype)+'</a></li>'
+
+                    a_tables += templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", str(rtype)).replace("{{table_id}}", "contributor_"+str(sanitized_entity)+"_"+str(rtype))
+
+                more_sidebar_links += '</ul></div></li></ul>'
+                a_template = a_template.replace("{{non_contributor_tables}}", a_tables)
+                more_sections += a_template
+        else:
+            more_sidebar_links = '<ul class="nav flex-column mb-0"><li class="nav-item"><ul class="nav flex-column ms-3"><li class="nav-item">No results</li></ul></li></ul>'
+            more_sections = '<h5>No anonymous Contributors found</h5>'
+
+
+        # We now merge all rtypes across all non-contributor results
+        tables_by_rtype = {}
+        for entity, data in self._contributors.items():
+            # Skip contributors this time
+            if self._gxcontext.isContributor(entity): continue
+
+            sanitized_entity = self.html_data_sanitize_and_process(entity)
+            for rtype in data.keys():
+                if not self.debug_enabled() and ("debug" in rtype.lower()): continue
+
+                if rtype not in tables_by_rtype:
+                    tables_by_rtype[rtype] = ""
+
+                for line in data[rtype]:
+                    tables_by_rtype[rtype] += f"<tr><td>{sanitized_entity}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>"
+
+        for rtype, table_rows in tables_by_rtype.items():
+            if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {table_rows.lower()}' for f in self._filters)): continue
+            more_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a href="#nav_more_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li></ul>'
+            table_html = templates['table'].replace("{{table_rows}}", table_rows) \
+                                       .replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype, '')}") \
+                                       .replace("{{table_id}}", f"nav_more_{rtype}")
+            more_sections += table_html
+
+
+
+        output = templates['main'].replace("{{repository_sections}}", repository_sections)
+        # repository sidebar links
+        output = output.replace("{{repository_sidebar_links}}", repository_sidebar_links)
+        # category sidebar links
+        output = output.replace("{{category_sidebar_links}}", category_sidebar_links)
+        # contributors sidebar links
+        output = output.replace("{{contributor_sidebar_links}}", contributor_sidebar_links)
+        # more sidebar links
+        output = output.replace("{{more_sidebar_links}}", more_sidebar_links)
+
+        output = output.replace("{{category_sections}}", category_sections)
+        output = output.replace("{{contributor_sections}}", contributor_sections)
+        output = output.replace("{{report_date}}", datetime.datetime.now().strftime("%B %d, %Y"))
+        output = output.replace("{{more_sections}}", more_sections)
+
+
+        if self._filters != None:
+            output = output.replace("{{filters_html_text}}",f" with <strong>FILTERS ENABLED</strong>: <i>{self._filters}</i>. Disable Filters to get more results")
+        else:
+            output = output.replace("{{filters_html_text}}","")
+
+        return output
+
+    def _create_text_output(self, skip_ansi):
         output = self._print_output(self._repositories, f"Repository https://github.com/ENTITY_STR", skip_ansi)
         output += self._print_output(self._contributors, f"account ENTITY_STR", skip_ansi)
 
@@ -188,15 +371,18 @@ class Output:
         return json_output
 
     def doOutput(self):
-        if self._outformat == 'text':
-            output = self._create_text_output(self._outfile)
+        if self._outformat == 'html':
+            output = self._create_html_output()
+        elif self._outformat == 'text':
+            output = self._create_text_output(self._gxcontext.getOutputFile())
         elif self._outformat == 'json':
             output = self._create_json_output()
         else:
             raise ValueError("Unsupported format!")
 
-        if self._outfile:
-            print(f"Writing (Appending) output to {self._outfile.name} in format {self._outformat}")
+        if self._gxcontext.getOutputFile(): 
+            self._outfile = open(self._gxcontext.getOutputFile(), 'w+')
+            self.warn(f"Writing output to [{self._outfile.name}] in format [{self._outformat}]")
             self._outfile.write(output)
             self._outfile.write("\n")
         else:
@@ -205,3 +391,19 @@ class Output:
         # Now reset persisting data!
         self.reset()
 
+    def testOutputFile(self):
+        outfile = self._gxcontext.getOutputFile()
+        if outfile:
+            if os.path.isdir(outfile):
+                print("[!] Can't specify a directory as the output file, exiting.")
+                sys.exit()
+            if os.path.isfile(outfile):
+                target = outfile
+            else:
+                target = os.path.dirname(outfile)
+                if target == '':
+                    target = '.'
+
+            if not os.access(target, os.W_OK):
+                print("[!] Cannot write to output file, exiting")
+                sys.exit()

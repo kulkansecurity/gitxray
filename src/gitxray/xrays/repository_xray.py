@@ -51,7 +51,7 @@ def run(gx_context, gx_output):
             login = cc.get('user').get('login')
             message = f"User {login} added a comment to a Commit on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
             total_comments[login] += 1
-            gx_output.c_log(message, rtype="v_comments", contributor=login)
+            gx_output.c_log(message, rtype="comments", contributor=login)
 
             created_at_ts = gh_time.parse_date(cc.get('created_at'))
             updated_at_ts = gh_time.parse_date(cc.get('updated_at'))
@@ -64,7 +64,7 @@ def run(gx_context, gx_output):
                 login_tmp = f"{login} [NOT a contributor]"
             else:
                 login_tmp = login
-            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Commits. {gx_context.verboseLegend()}", rtype="comments", contributor=login)
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Commits.", rtype="comments", contributor=login)
             #gx_output.c_log(f"{ccount} Comments added to Commits by [{login}] available at: {repository.get('url')}/comments", rtype="comments")
 
         # Not adding much value 
@@ -94,7 +94,7 @@ def run(gx_context, gx_output):
             login = cc.get('user').get('login')
             message = f"User [{login}] added a comment to an Issue on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
             total_comments[login] += 1
-            gx_output.c_log(message, rtype="v_comments", contributor=login)
+            gx_output.c_log(message, rtype="comments", contributor=login)
 
             created_at_ts = gh_time.parse_date(cc.get('created_at'))
             updated_at_ts = gh_time.parse_date(cc.get('updated_at'))
@@ -107,7 +107,7 @@ def run(gx_context, gx_output):
                 login_tmp = f"{login} [NOT a contributor]"
             else:
                 login_tmp = login
-            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Issues. {gx_context.verboseLegend()}", rtype="comments", contributor=login)
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to Issues.", rtype="comments", contributor=login)
             #gx_output.c_log(f"{ccount} Comments added to Issues by [{login}] available at: {repository.get('url')}/issues/comments", rtype="comments")
 
         gx_output.r_log(f"{len(issues_comments)} Comments in issues available at: {repository.get('url')}/issues/comments", rtype="comments")
@@ -131,11 +131,14 @@ def run(gx_context, gx_output):
         negative_reactions = defaultdict(int)
         neutral_reactions = defaultdict(int)
         for cc in pulls_comments:
-            gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
-            login = cc.get('user').get('login')
+            try:
+                gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
+                login = cc.get('user', {}).get('login', None)
+            except:
+                continue
             message = f"User {login} added a comment to a PR on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
             total_comments[login] += 1
-            gx_output.c_log(message, rtype="v_comments", contributor=login)
+            gx_output.c_log(message, rtype="comments", contributor=login)
 
             created_at_ts = gh_time.parse_date(cc.get('created_at'))
             updated_at_ts = gh_time.parse_date(cc.get('updated_at'))
@@ -148,7 +151,7 @@ def run(gx_context, gx_output):
                 login_tmp = f"{login} [NOT a contributor]"
             else:
                 login_tmp = login
-            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to PRs. {gx_context.verboseLegend()}", rtype="comments", contributor=login)
+            gx_output.c_log(f"User {login_tmp} added {ccount} Comments to PRs.", rtype="comments", contributor=login)
             #gx_output.c_log(f"{ccount} Comments added to PRs by [{login}] available at: {repository.get('url')}/pulls/comments", rtype="comments")
 
         gx_output.r_log(f"{len(pulls_comments)} Comments in pulls available at: {repository.get('url')}/pulls/comments", rtype="comments")
@@ -216,11 +219,11 @@ def run(gx_context, gx_output):
         tagger = tag.get('tagger')
         if tagger == None:
             # Lightweight tags - for some reason GitHub's API is returning stripped down version of tags even if they are not lightweight
-            gx_output.r_log(f"Tag [{tag.get('name')}] is available at: [{repository.get('html_url')}/tags]", rtype="v_tags")
+            gx_output.r_log(f"Tag [{tag.get('name')}] is available at: [{repository.get('html_url')}/tags]", rtype="tags")
         else: 
             tagger = tagger.get('email')
             tag_taggers[tagger] += 1
-            gx_output.r_log(f"A tag was created by {tagger} at {tag.get('tagger').get('date')}: {tag.get('url')}", rtype="v_tags")
+            gx_output.r_log(f"A tag was created by {tagger} at {tag.get('tagger').get('date')}: {tag.get('url')}", rtype="tags")
 
     total_tags = sum(tag_taggers.values())
     for tagger, tags in tag_taggers.items():
@@ -238,7 +241,7 @@ def run(gx_context, gx_output):
 
     for release in releases:
         release_authors[release.get('author').get('login')] += 1
-        gx_output.r_log(f"A release was created by {release.get('author').get('login')} at {release.get('created_at')}: {release.get('html_url')}", rtype="v_releases")
+        gx_output.r_log(f"A release was created by {release.get('author').get('login')} at {release.get('created_at')}: {release.get('html_url')}", rtype="releases")
         if len(release.get('assets')) > 0:
             # This release has assets other than frozen code. Let's check if updated_at differs from created_at
             # Which may be an indicator of a compromised release by a malicious actor updating binaries.
@@ -247,8 +250,8 @@ def run(gx_context, gx_output):
                 asset_uploaders[uploaded_by] += 1
                 created_at = asset.get('created_at')
                 message = f"An asset was uploaded by {uploaded_by} at {created_at}: {asset.get('url')}"
-                gx_output.r_log(message, rtype="v_releases")
-                gx_output.c_log(message, rtype="v_releases", contributor=uploaded_by)
+                gx_output.r_log(message, rtype="releases")
+                gx_output.c_log(message, rtype="releases", contributor=uploaded_by)
                 created_at_ts = gh_time.parse_date(created_at)
                 updated_at = asset.get('updated_at')
                 updated_at_ts = gh_time.parse_date(updated_at)
@@ -274,8 +277,6 @@ def run(gx_context, gx_output):
         else:
             message += " and never uploaded assets."
 
-        if gx_context.verboseEnabled() == False: message += " Turn on Verbose mode for more information."
-
         gx_output.r_log(message, rtype="releases")
         gx_output.c_log(message, rtype="releases", contributor=author)
 
@@ -284,7 +285,6 @@ def run(gx_context, gx_output):
         assets = asset_uploaders[uploader]
         percentage_assets = (assets / total_assets) * 100
         message = f"WARNING: User {uploader} has uploaded {assets} assets [{percentage_assets:.2f}%] and never created a release."
-        if gx_context.verboseEnabled() == False: message += " Turn on Verbose mode for more information."
         gx_output.r_log(message, rtype="releases")
         gx_output.c_log(message, rtype="releases", contributor=uploader)
 
@@ -395,7 +395,10 @@ def run(gx_context, gx_output):
     submitter_notcontrib_counts = defaultdict(lambda: {'submitted': 0, 'accepted':0, 'open': 0, 'rejected': 0})
     clogins = [c.get('login') for c in contributors]
     for pr in prs:
-        submitter = pr['user']['login']
+        try: # quick ugly patch instead of checking all types are dict and keys exist.
+            submitter = pr['user']['login']
+        except: 
+            continue
         is_merged = pr['merged_at'] is not None
         if submitter not in clogins: 
             submitter_counts = submitter_notcontrib_counts
