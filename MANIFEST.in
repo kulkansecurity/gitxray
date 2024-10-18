@@ -1,0 +1,1 @@
+recursive-include gitxray/include/html_report *.html
