@@ -62,7 +62,7 @@ def run(gx_context, gx_output):
                 decoded_content = base64.b64decode(encoded_content).decode('utf-8').lower()
 
                 # https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners
-                if "self-hosted" in decoded_content: gx_output.rlog(f"Workflow [{workflow.get('name')}] appears to be executing in a self-hosted runner: [{workflow.get('html_url')}]", rtype="workflows")
+                if "self-hosted" in decoded_content: gx_output.r_log(f"Workflow [{workflow.get('name')}] appears to be executing in a self-hosted runner: [{workflow.get('html_url')}]", rtype="workflows")
 
                 # https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/
                 if any(a in decoded_content for a in ["pull_request_target","workflow_run","issue_comment","issue:"]):
