@@ -1,5 +1,8 @@
 # Changelog
 
+## Release v1.0.16.1 (October 22nd, 2024)
+* Fixed a typo in a call to r_log() which led to an uhandled exception when scanning repositories with self-hosted runners. Special thanks to @farnaboldi for reporting the issue.
+
 ## Release v1.0.16 (October 18th, 2024)
 * Added a brand new HTML output format/report by default, making results a lot easier to navigate! Custom search bar instead of relying on DataTables which can be super slow for large HTML files. We're now also groupping results by Category across all contributors and highlighting results which contain a WARNING keyword.
 * Added certain association results to Contributor results, not all to prevent extra noise.
