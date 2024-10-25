@@ -240,13 +240,21 @@ def run(gx_context, gx_output):
     asset_uploaders = defaultdict(int)
 
     for release in releases:
-        release_authors[release.get('author').get('login')] += 1
-        gx_output.r_log(f"A release was created by {release.get('author').get('login')} at {release.get('created_at')}: {release.get('html_url')}", rtype="releases")
+        if release.get('author') == None:
+            author = "NO_USERNAME"
+        else:
+            author = release.get('author').get('login')
+
+        release_authors[author] += 1
+        gx_output.r_log(f"A release was created by {author} at {release.get('created_at')}: {release.get('html_url')}", rtype="releases")
         if len(release.get('assets')) > 0:
             # This release has assets other than frozen code. Let's check if updated_at differs from created_at
             # Which may be an indicator of a compromised release by a malicious actor updating binaries.
             for asset in release.get('assets'):
-                uploaded_by = asset.get('uploader').get('login')
+                if asset.get('uploader') == None:
+                    uploaded_by = "NO_USERNAME"
+                else:
+                    uploaded_by = asset.get('uploader').get('login')
                 asset_uploaders[uploaded_by] += 1
                 created_at = asset.get('created_at')
                 message = f"An asset was uploaded by {uploaded_by} at {created_at}: {asset.get('url')}"
