@@ -1,5 +1,8 @@
 # Changelog
 
+## Release v1.0.16.2 (October 25th, 2024)
+* Added validation against Null values for fields "author" and "uploader" in Releases and Assets. Special thanks to @fearcito for reporting the issue.
+
 ## Release v1.0.16.1 (October 22nd, 2024)
 * Fixed a typo in a call to r_log() which led to an uhandled exception when scanning repositories with self-hosted runners. Special thanks to @farnaboldi for reporting the issue.
 
