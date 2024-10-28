@@ -1,5 +1,8 @@
 # Changelog
 
+## Release v1.0.16.3 (October 28th, 2024)
+* Only showing "updated at" for comments if the created_at and updated_at field values differ. This helps place focus on updated comments which could potentially reveal a contributor trying to hide a past comment. GitHub is kind to show an Edit history for said comments as a menu option next to the comment itself.
+
 ## Release v1.0.16.2 (October 25th, 2024)
 * Added validation against Null values for fields "author" and "uploader" in Releases and Assets. Special thanks to @fearcito for reporting the issue.
 

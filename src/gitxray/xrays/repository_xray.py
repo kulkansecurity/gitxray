@@ -49,7 +49,7 @@ def run(gx_context, gx_output):
         for cc in commit_comments:
             gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
             login = cc.get('user').get('login')
-            message = f"User {login} added a comment to a Commit on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
+            message = (f"User {login} added a comment to a Commit on [{cc.get('created_at')}]" + (f", and then updated it on [{cc.get('updated_at')}]" if cc.get('updated_at') != cc.get('created_at') else "") + f": {cc.get('html_url')}")
             total_comments[login] += 1
             gx_output.c_log(message, rtype="comments", contributor=login)
 
@@ -92,7 +92,7 @@ def run(gx_context, gx_output):
         for cc in issues_comments:
             gh_reactions.categorize_reactions(cc, positive_reactions, negative_reactions, neutral_reactions)
             login = cc.get('user').get('login')
-            message = f"User [{login}] added a comment to an Issue on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
+            message = (f"User {login} added a comment to an Issue on [{cc.get('created_at')}]" + (f", and then updated it on [{cc.get('updated_at')}]" if cc.get('updated_at') != cc.get('created_at') else "") + f": {cc.get('html_url')}")
             total_comments[login] += 1
             gx_output.c_log(message, rtype="comments", contributor=login)
 
@@ -136,7 +136,7 @@ def run(gx_context, gx_output):
                 login = cc.get('user', {}).get('login', None)
             except:
                 continue
-            message = f"User {login} added a comment to a PR on [{cc.get('created_at')}], updated [{cc.get('updated_at')}]: {cc.get('html_url')}"
+            message = (f"User {login} added a comment to a PR on [{cc.get('created_at')}]" + (f", and then updated it on [{cc.get('updated_at')}]" if cc.get('updated_at') != cc.get('created_at') else "") + f": {cc.get('html_url')}")
             total_comments[login] += 1
             gx_output.c_log(message, rtype="comments", contributor=login)
 
