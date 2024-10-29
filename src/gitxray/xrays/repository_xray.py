@@ -240,6 +240,11 @@ def run(gx_context, gx_output):
     asset_uploaders = defaultdict(int)
 
     for release in releases:
+        # Particular case in which the GitHub API returns erratic data, mostly happening when not using an auth token
+        # This needs to be fixed at a lower level in our gh_api code, patching here in the meantime.
+        if not isinstance(release, dict):
+            continue
+
         if release.get('author') == None:
             author = "NO_USERNAME"
         else:
