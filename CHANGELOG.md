@@ -1,5 +1,8 @@
 # Changelog
 
+## Release v1.0.16.4 (October 30th, 2024)
+* Fixed an error case that should be fixed in gh_api.py eventually: GitHub returning unexpected error responses when querying for certain releases while being unauthenticated. Thank you once again @fearcito for your input and testing.
+
 ## Release v1.0.16.3 (October 28th, 2024)
 * Only showing "updated at" for comments if the created_at and updated_at field values differ. This helps place focus on updated comments which could potentially reveal a contributor trying to hide a past comment. GitHub is kind to show an Edit history for said comments as a menu option next to the comment itself.
 
