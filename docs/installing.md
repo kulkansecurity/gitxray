@@ -31,6 +31,19 @@ cd src/
 python3 -m gitxray.gitxray
 ```
 
+## Creating an Access Token to increase Rate Limits
+
+Gitxray gracefully handles Rate Limits and can work out of the box without a GitHub API token, but you'll likely hit RateLimits pretty fast (A small to medium-size repository with 10+ Contributors could take hours to complete while it waits for RateLimits to reset) This is detailed by GitHub in their [documentation here](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users). 
+
+[Creating a simple read-only token scoped to PUBLIC repositories](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token) will however help you increase those restrictions considerably. If you're not in a hurry or can leave gitxray running you'll be able to use its full capacity, as it pauses execution while waiting for the limits to lift.
+
+You may then load the token safely by using (prevents the token from being displayed on screen or getting logged in your shell history):
+
+```bash
+read -rs GH_ACCESS_TOKEN
+export
+```
+
 ## Command Line Arguments
 
 ### Required Arguments
