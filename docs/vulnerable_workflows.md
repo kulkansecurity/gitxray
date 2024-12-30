@@ -27,6 +27,8 @@ Either way, here's a list of specialized software and documentation on how to pr
 
 * [https://medium.com/tinder/exploiting-github-actions-on-open-source-projects-5d93936d189f](https://medium.com/tinder/exploiting-github-actions-on-open-source-projects-5d93936d189f)
 
+* [OSSF: Mitigating Attack Vectors in GitHub Workflows](https://openssf.org/blog/2024/08/12/mitigating-attack-vectors-in-github-workflows/)
+
 # Videos 
 
 * [https://www.youtube.com/watch?v=Ers-LcA7Nmc](https://www.youtube.com/watch?v=Ers-LcA7Nmc) - A great video and slides by Rob Bos on GitHub Actions with security in mind
