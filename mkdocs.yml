@@ -13,6 +13,7 @@ nav:
   - 'features.md'
   - 'vulnerable_workflows.md'
   - 'code_structure.md'
+  - 'gitxray_buzz.md'
 
 markdown_extensions:
   - toc:
