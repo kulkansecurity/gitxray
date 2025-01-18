@@ -1,5 +1,4 @@
 import os, requests, base64, re, time, urllib
-from . import gx_definitions, gx_output
 
 # GitHub API URL
 GITHUB_API_BASE_URL = "https://api.github.com"
@@ -83,7 +82,7 @@ def github_request_json(url, params=None, limit_results=None):
                     message = f"GitHub Rate limit reached. Sleeping for {hours} hours, {minutes} minutes, and {seconds} seconds. You may go and make coffee.."
                     print(f"\r\n\033[33m{message}\033[0m", flush=True)
                     if GITHUB_TOKEN == None:
-                        message = f"You should try using a Github Access Token, improves the experience significantly and it's easy!"
+                        message = f"You should try using a GitHub Access Token, improves the experience significantly and it's easy!"
                         print(f"\033[33m{message}\033[0m", flush=True)
                         print("For information on how to create a GitHub API Access Token refer to: ")
                         print("https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens")
@@ -218,7 +217,14 @@ def fetch_repository_branches(repo):
     return github_request_json(f"{GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/branches")
 
 def fetch_repository_contributors(repo):
-    return github_request_json(repo.get('contributors_url'), {'anon':1})
+    data = github_request_json(repo.get('contributors_url'), {'anon':1})
+    # Disregarding if anon is set to 1/True or not, in extremely large repositories, GH returns a 403 status with:
+    # "The history or contributor list is too large to list contributors for this repository via the API."
+    if isinstance(data, dict) and data.get("status", "0") == "403": 
+        print(f"\r\n\033[33mGitHub's REST API declined returning the list of Contributors with a message:\033[0m", flush=True)
+        print(f"\033[33m{data.get('message','')}\033[0m", flush=True)
+        return {}
+    return data
 
 def fetch_repository_deployments(repo):
     return github_request_json(repo.get('deployments_url'))
