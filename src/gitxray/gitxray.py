@@ -19,8 +19,8 @@ def gitxray_cli():
  ███ ░███                                                  ███ ░███ 
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
-gitxray: X-Ray and analyze Github Repositories and their Contributors. Trust no one!
-v1.0.16.4 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+gitxray: X-Ray and analyze GitHub Repositories and their Contributors. Trust no one!
+v1.0.16.5 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
@@ -32,7 +32,7 @@ v1.0.16.4 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing 
     # Let's warn the user that unauth RateLimits are pretty low
     if not gx_context.usingToken():
         gx_output.warn(f"{gx_definitions.ENV_GITHUB_TOKEN} environment variable not set, using GitHub RateLimits unauthenticated.")
-        gx_output.warn("Unauthenticated requests to the Github API will enforce a very low and strict RateLimit.")
+        gx_output.warn("Unauthenticated requests to the GitHub API will enforce a very low and strict RateLimit.")
         gx_output.warn("Without setting a GitHub token you may only be able to scan small repositories uninterruptedly.")
     else:
         gx_output.notify(f"GitHub Token loaded from {gx_definitions.ENV_GITHUB_TOKEN} env variable.")
