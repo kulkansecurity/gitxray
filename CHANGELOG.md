@@ -1,5 +1,8 @@
 # Changelog
 
+## Release v1.0.16.5 (January 18th, 2025)
+* Fixed an error case (an unhandled exception) that showed up when scanning repositories with a very large list of contributors (e.g. torvalds/linux, or MicrosoftDocs/azure-docs), which leads to GitHub REST APIs responding in an undocumented manner, stating that: "The history or contributor list is too large to list contributors for this repository via the API".
+
 ## Release v1.0.16.4 (October 30th, 2024)
 * Fixed an error case that should be fixed in gh_api.py eventually: GitHub returning unexpected error responses when querying for certain releases while being unauthenticated. Thank you once again @fearcito for your input and testing.
 
