@@ -53,9 +53,9 @@ def run(gx_context, gx_output):
             raise Exception("Contributor of Type !== User/Anonymous found. Failing almost gracefully")
 
     if contributor_scope == None:
-        print(f"\r\nDiscovered {len(c_users)} contributors with Github User accounts, and {len(c_anon)} Anonymous contributors", end='', flush=True)
+        print(f"\r\nDiscovered {len(c_users)} contributors with GitHub User accounts, and {len(c_anon)} Anonymous contributors", end='', flush=True)
         gx_output.r_log(f"Repository has {len(c_anon)} Anonymous contributors.", rtype="contributors")
-        gx_output.r_log(f"Repository has {len(c_users)} contributors with Github User accounts.", rtype="contributors")
+        gx_output.r_log(f"Repository has {len(c_users)} contributors with GitHub User accounts.", rtype="contributors")
 
     print(f"\r\nPlease wait, beginning to collect keys and commits for User contributors..", end='', flush=True)
 
@@ -204,7 +204,7 @@ def run(gx_context, gx_output):
         unique_pgp_sct = set(attribute.get('pgp_signature_creation_time') for attribute in signature_attributes if attribute.get('pgp_signature_creation_time') is not None)
         unique_pgp_keyids = set(attribute.get('pgp_keyid') for attribute in signature_attributes if attribute.get('pgp_keyid') is not None)
 
-        # We don't link SSH Key IDs because SSH keys are unique across Github; PGP keys can be added to more than 1 account.
+        # We don't link SSH Key IDs because SSH keys are unique across GitHub; PGP keys can be added to more than 1 account.
         gx_context.linkIdentifier("PGP_KEYID", unique_pgp_keyids, contributor_login)
         gx_context.linkIdentifier("PGP_PKA", unique_pgp_pka, contributor_login)
         gx_context.linkIdentifier("PGP_HA", unique_pgp_ha, contributor_login)
@@ -228,7 +228,7 @@ def run(gx_context, gx_output):
 
 
         # https://docs.github.com/en/rest/users/gpg-keys?apiVersion=2022-11-28#list-gpg-keys-for-a-user
-        # Github calls them GPG keys, but we're going to refer to them as PGP for the OpenPGP standard
+        # GitHub calls them GPG keys, but we're going to refer to them as PGP for the OpenPGP standard
         pgp_keys = gh_api.fetch_gpg_keys(contributor_login)
         if pgp_keys != None and len(pgp_keys) > 0:
             primary_key_ids = [key.get('key_id') for key in pgp_keys]
@@ -334,12 +334,12 @@ def run(gx_context, gx_output):
         # Unique key ids for now only holds keys we've extracted from commit signatures
         if len(unique_pgp_keyids) > 0:
             # https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#constructing-a-search-query
-            # Unfortunately Github requires (for other users than our own) to provide (non-regex) input keywords in order to
+            # Unfortunately GitHub requires (for other users than our own) to provide (non-regex) input keywords in order to
             # return results in the commits API which accept filtering such as is:signed - and input keywords restrict our results.
             gx_output.c_log(f"{len(unique_pgp_keyids)} Keys ({unique_pgp_keyids}) were used by this contributor when signing commits.", rtype="keys")
             github_keys_used = [keyid for keyid in unique_pgp_keyids if keyid in gx_definitions.GITHUB_WEB_EDITOR_SIGNING_KEYS]
             if len(github_keys_used) > 0:
-                gx_output.c_log(f"{len(github_keys_used)} of the keys used to sign commits belong to Github's Web editor {github_keys_used}", rtype="keys")
+                gx_output.c_log(f"{len(github_keys_used)} of the keys used to sign commits belong to GitHub's Web editor {github_keys_used}", rtype="keys")
 
         if len(commits) == len(signed_commits):
             gx_output.c_log(f"Contributor has signed all of their {len(signed_commits)} total commits (to this repo).", rtype="signatures")
@@ -383,7 +383,7 @@ def run(gx_context, gx_output):
         gx_output.c_log(f"X-Ray on contributor ended at {c_ended_at} - {(c_ended_at-c_started_at).seconds} seconds elapsed", rtype="metrics")
 
     # Let's first create a dictionary merging by email - this is because duplicate anonymous are "normal" or regularly seen
-    # Github checks if any of (email OR name) differ and if so treats the anonymous user as different
+    # GitHub checks if any of (email OR name) differ and if so treats the anonymous user as different
     # Add all of these under Anonymous contributor output
     unique_anonymous = {}
     for ac in c_anon:

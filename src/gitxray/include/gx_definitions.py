@@ -2,7 +2,7 @@
 ENV_GITHUB_TOKEN = "GH_ACCESS_TOKEN"
 
 # GitHub has historically signed commits made via its web editor with a Key that expired in 2024
-# The latest Key however has no expiration set. The "web-flow" Github account owns these keys:
+# The latest Key however has no expiration set. The "web-flow" GitHub account owns these keys:
 # GitHub (web-flow commit signing) <noreply@github.com>
 # https://api.github.com/users/web-flow/gpg_keys
 GITHUB_WEB_EDITOR_SIGNING_KEYS = ['4AEE18F83AFDEB23', 'B5690EEEBB952194']

@@ -14,7 +14,7 @@ Either way, here's a list of specialized software and documentation on how to pr
 
 * [https://github.com/tindersec/gh-workflow-auditor](https://github.com/tindersec/gh-workflow-auditor) - A script by Tinder Security which analyzes multiple aspects of a Workflow.
 
-# Articles about Github Workflows and Security
+# Articles about GitHub Workflows and Security
 
 ## Official by GitHub
 
