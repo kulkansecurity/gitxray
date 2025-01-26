@@ -1,15 +1,15 @@
 from datetime import datetime, timezone
 from collections import defaultdict
 import math
-from gitxray.include import gh_api, gh_time, gh_public_events, gh_reactions
+from gitxray.include import gh_time, gh_public_events, gh_reactions
 
-def run(gx_context, gx_output):
-    print("Running verifications on the repository..")
+def run(gx_context, gx_output, gh_api):
+    gx_output.stdout("Running verifications on the repository..")
 
     repository = gx_context.getRepository()
     contributors = gx_context.getContributors()
 
-    print(f"Checking for similar repository names in GitHub.."+" "*40, end="")
+    gx_output.stdout(f"Checking for similar repository names in GitHub.."+" "*40, end="")
     # This gets all repository names matching our repository name, sorted first by highest rating
     similar_names = gh_api.search_repositories_by_name(repository.get('name'), limit=10)
     if similar_names != None and similar_names.get('total_count') != None and similar_names.get('total_count') > 0:
@@ -39,7 +39,7 @@ def run(gx_context, gx_output):
 
     # These go in the repository xray and not contributors because the REST API returns all per repository
     # https://api.github.com/repos/infobyte/faraday/issues/comments - and won't allow filtering in a helpful (to us) way
-    print(f"\rGetting all repository comments on commits.."+" "*40, end="")
+    gx_output.stdout(f"\rGetting all repository comments on commits.."+" "*40, end="")
     commit_comments = gh_api.fetch_repository_commit_comments(repository)
     if len(commit_comments) > 0: 
         total_comments = defaultdict(int)
@@ -82,7 +82,7 @@ def run(gx_context, gx_output):
             if count > 0: gx_output.r_log(f"The Commits comment with the most NEUTRAL reactions ({count}) is available at: {url}", rtype="comments")
 
     
-    print(f"\rGetting all repository comments on issues.."+" "*30, end="")
+    gx_output.stdout(f"\rGetting all repository comments on issues.."+" "*30, end="")
     issues_comments = gh_api.fetch_repository_issues_comments(repository)
     if issues_comments != None and len(issues_comments) > 0: 
         total_comments = defaultdict(int)
@@ -123,7 +123,7 @@ def run(gx_context, gx_output):
             url, count = gh_reactions.sort_reactions(neutral_reactions)[0]
             if count > 0: gx_output.r_log(f"The Issues comment with the most NEUTRAL reactions ({count}) is available at: {url}", rtype="comments")
 
-    print(f"\rGetting all repository comments on pull requests.."+" "*30, end="")
+    gx_output.stdout(f"\rGetting all repository comments on pull requests.."+" "*30, end="")
     pulls_comments = gh_api.fetch_repository_pulls_comments(repository)
     if pulls_comments != None and len(pulls_comments) > 0: 
         total_comments = defaultdict(int)
@@ -168,12 +168,12 @@ def run(gx_context, gx_output):
             if count > 0: gx_output.r_log(f"The PRs comment with the most NEUTRAL reactions ({count}) is available at: {url}", rtype="comments")
 
 
-    print(f"\rChecking for repository deployments.."+" "*30, end="")
+    gx_output.stdout(f"\rChecking for repository deployments.."+" "*30, end="")
     if repository.get('deployments_url'):
          deployments = gh_api.fetch_repository_deployments(repository)
          if len(deployments) > 0: gx_output.r_log(f"{len(deployments)} Deployments available at: [{repository.get('html_url')}/deployments]", rtype="deployments")
 
-    print(f"\rChecking for repository environments.."+" "*30, end="")
+    gx_output.stdout(f"\rChecking for repository environments.."+" "*30, end="")
     environments = gh_api.fetch_repository_environments(repository)
     if environments != None and environments.get('total_count') != None and environments.get('total_count') > 0:
         gx_output.r_log(f"{environments.get('total_count')} Environments available at: [{repository.get('url')}/environments]", rtype="environments")
@@ -181,11 +181,11 @@ def run(gx_context, gx_output):
             gx_output.r_log(f"Environment [{environment.get('name')}] created [{environment.get('created_at')}], updated [{environment.get('updated_at')}]: {environment.get('html_url')}", rtype="environments")
             #print(gh_api.fetch_environment_protection_rules(repository, environment.get('name')))
 
-    print(f"\rChecking for repository forks.."+" "*30, end="")
+    gx_output.stdout(f"\rChecking for repository forks.."+" "*30, end="")
     if repository.get('forks_count') > 0:
         gx_output.r_log(f"Repository has {repository.get('forks_count')} forks: {repository.get('forks_url')}", rtype="profiling")
 
-    print(f"\rInspecting repository branches.."+" "*40, end="")
+    gx_output.stdout(f"\rInspecting repository branches.."+" "*40, end="")
     branches = gh_api.fetch_repository_branches(repository)
     if branches != None and len(branches) > 0: 
         gx_output.r_log(f"{len(branches)} Branches available at: [{repository.get('html_url')}/branches]", rtype="branches")
@@ -200,7 +200,7 @@ def run(gx_context, gx_output):
         if len(unprotected_branches) > 0: gx_output.r_log(f"{len(unprotected_branches)} Unprotected Branches: {unprotected_branches}", rtype="branches")
         if len(protected_branches) > 0: gx_output.r_log(f"{len(protected_branches)} Protected Branches: {protected_branches}", rtype="branches")
 
-    print(f"\rInspecting repository labels.."+" "*40, end="")
+    gx_output.stdout(f"\rInspecting repository labels.."+" "*40, end="")
     labels = gh_api.fetch_repository_labels(repository)
     if labels != None and len(labels) > 0: 
         gx_output.r_log(f"{len(labels)} Labels available at: [{repository.get('html_url')}/labels]", rtype="labels")
@@ -208,7 +208,7 @@ def run(gx_context, gx_output):
         if len(non_default_labels) > 0:
             gx_output.r_log(f"{len(non_default_labels)} Non-default Labels: {non_default_labels} available at: [{repository.get('html_url')}/labels]", rtype="labels")
 
-    print(f"\rInspecting repository tags.."+" "*40, end="")
+    gx_output.stdout(f"\rInspecting repository tags.."+" "*40, end="")
     tags = gh_api.fetch_repository_tags(repository)
     if tags != None and len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="tags")
     tag_taggers = defaultdict(int)
@@ -232,7 +232,7 @@ def run(gx_context, gx_output):
         gx_output.r_log(message, rtype="tags")
 
 
-    print(f"\rInspecting repository releases.."+" "*40, end="")
+    gx_output.stdout(f"\rInspecting repository releases.."+" "*40, end="")
     releases = gh_api.fetch_repository_releases(repository)
     if len(releases) > 0: gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="releases")
 
@@ -359,11 +359,11 @@ def run(gx_context, gx_output):
     if repository.get('fork') != False:
         parent = repository.get('parent').get('full_name')
         source = repository.get('source').get('full_name')
-        print(f"\rRepository is a FORK of a parent named: {repository.get('parent').get('full_name')}: {repository.get('parent')['html_url']}")
+        gx_output.stdout(f"\rRepository is a FORK of a parent named: {repository.get('parent').get('full_name')}: {repository.get('parent')['html_url']}")
         gx_output.r_log(f"Repository is a FORK of repo: {repository.get('parent')['html_url']}", rtype="fork")
-        print(f"This also means that GitHub will return ALL contributors (might be a LOT) up to the source repository")
+        gx_output.stdout(f"This also means that GitHub will return ALL contributors (might be a LOT) up to the source repository")
         if parent != source:
-            print(f"Please know the parent of this repository is not the original source, which is: {source}") 
+            gx_output.stdout(f"Please know the parent of this repository is not the original source, which is: {source}") 
             gx_output.r_log(f"The parent of this fork comes from SOURCE repo: {repository.get('source')['html_url']}", rtype="fork")
 
 

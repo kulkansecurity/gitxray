@@ -69,13 +69,18 @@ class Output:
         return self._debug
    
     # Direct output, not really waiting for results to print this out.
-    def warn(self, message):
+    def warn(self, message, shushable=True):
         colored_message = f"{self.ANSI_COLORS['YELLOW']}{message}{self.ANSI_COLORS['RESET']}"
-        return print(colored_message)
+        return self.stdout(colored_message, shushable)
 
-    def notify(self, message):
+    def notify(self, message, shushable=True):
         colored_message = f"{self.ANSI_COLORS['BRIGHT_BLUE']}{message}{self.ANSI_COLORS['RESET']}"
-        return print(colored_message)
+        return self.stdout(colored_message, shushable)
+
+    # Stdout goes through here
+    def stdout(self, message, shushable=True, end='\n', flush=True):
+        if shushable and self._gxcontext.shushEnabled(): return
+        return print(message, end=end, flush=flush)
 
     def get_rtype_color(self, rtype):
         if rtype not in self._rtype_color_map:
@@ -382,7 +387,7 @@ class Output:
 
         if self._gxcontext.getOutputFile(): 
             self._outfile = open(self._gxcontext.getOutputFile(), 'w+')
-            self.warn(f"Writing output to [{self._outfile.name}] in format [{self._outformat}]")
+            self.warn(f"Writing output to [{self._outfile.name}] in format [{self._outformat}]", shushable=False)
             self._outfile.write(output)
             self._outfile.write("\n")
         else:

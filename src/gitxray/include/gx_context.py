@@ -18,6 +18,9 @@ class Context:
     def debugEnabled(self):
         return self._cmd_args.debug
 
+    def shushEnabled(self):
+        return self._cmd_args.shush
+
     def listAndQuit(self):
         return self._cmd_args.list
 

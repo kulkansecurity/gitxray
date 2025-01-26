@@ -1,10 +1,10 @@
-from gitxray.include import gh_api, gh_time, gh_public_events, gx_definitions
+from gitxray.include import gh_time, gh_public_events, gx_definitions
 from gitxray.include import gx_ugly_openpgp_parser, gx_ugly_ssh_parser 
 from datetime import datetime, timezone
 from collections import defaultdict
 import sys, re, base64
 
-def run(gx_context, gx_output):
+def run(gx_context, gx_output, gh_api):
 
     repository = gx_context.getRepository()
     contributor_scope = gx_context.getContributorScope()
@@ -12,7 +12,7 @@ def run(gx_context, gx_output):
     if contributor_scope != None:
         gx_output.notify(f"YOU HAVE SCOPED THIS GITXRAY TO CONTRIBUTORS: {contributor_scope} - OTHER USERS WON'T BE ANALYZED.")
 
-    print(f"Querying GitHub for repository contributors.. Please wait.", end='', flush=True)
+    gx_output.stdout(f"Querying GitHub for repository contributors.. Please wait.", shushable=True, end='', flush=True)
 
     # Let's store the whole set of contributors in the context
     gx_context.setContributors(gh_api.fetch_repository_contributors(repository))
@@ -21,7 +21,7 @@ def run(gx_context, gx_output):
     c_anon = []
 
     c_len = len(gx_context.getContributors())
-    print(f"\rIdentified {c_len} contributors.." + ' '*70, flush=True)
+    gx_output.stdout(f"\rIdentified {c_len} contributors.." + ' '*70, shushable=True, flush=True)
 
     # If focused on a contributor, let's first make sure the contributor exists in the repository
     if contributor_scope != None:
@@ -32,17 +32,17 @@ def run(gx_context, gx_output):
 
     # Were were invoked to just list contributors and quit?
     if gx_context.listAndQuit():
-        gx_output.notify(f"LISTING CONTRIBUTORS (INCLUDING THOSE WITHOUT A GITHUB USER ACCOUNT) AND EXITING..")
-        print(", ".join([c.get('login', c.get('email')) for c in gx_context.getContributors()]))
+        gx_output.notify(f"LISTING CONTRIBUTORS (INCLUDING THOSE WITHOUT A GITHUB USER ACCOUNT) AND EXITING..", shushable=False)
+        gx_output.stdout(", ".join([c.get('login', c.get('email')) for c in gx_context.getContributors()]), shushable=False)
         return False
 
     if c_len > 500:
-        print(f"IMPORTANT: The repository has 500+ contributors. GitHub states > 500 contributors will appear as Anonymous")
-        print(f"More information at: https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-contributors")
+        gx_output.stdout(f"IMPORTANT: The repository has 500+ contributors. GitHub states > 500 contributors will appear as Anonymous")
+        gx_output.stdout(f"More information at: https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-contributors")
 
     for i, c in enumerate(gx_context.getContributors()):
         if contributor_scope != None and c.get('login') not in contributor_scope: continue
-        print('\rFetching repository contributor details [{}/{}]'.format(i+1, c_len), end='', flush=True)
+        gx_output.stdout('\rFetching repository contributor details [{}/{}]'.format(i+1, c_len), end='', flush=True)
         ctype = c.get('type')
         if ctype in ["User", "Bot"]:
             c_users.append(gh_api.fetch_contributor(c))
@@ -53,11 +53,11 @@ def run(gx_context, gx_output):
             raise Exception("Contributor of Type !== User/Anonymous found. Failing almost gracefully")
 
     if contributor_scope == None:
-        print(f"\r\nDiscovered {len(c_users)} contributors with GitHub User accounts, and {len(c_anon)} Anonymous contributors", end='', flush=True)
+        gx_output.stdout(f"\r\nDiscovered {len(c_users)} contributors with GitHub User accounts, and {len(c_anon)} Anonymous contributors", end='', flush=True)
         gx_output.r_log(f"Repository has {len(c_anon)} Anonymous contributors.", rtype="contributors")
         gx_output.r_log(f"Repository has {len(c_users)} contributors with GitHub User accounts.", rtype="contributors")
 
-    print(f"\r\nPlease wait, beginning to collect keys and commits for User contributors..", end='', flush=True)
+    gx_output.stdout(f"\r\nPlease wait, beginning to collect keys and commits for User contributors..", end='', flush=True)
 
     c_users_index = 1
     for contributor in c_users:
@@ -68,7 +68,7 @@ def run(gx_context, gx_output):
         c_started_at = datetime.now()
         gx_output.c_log(f"X-Ray on contributor started at {c_started_at}", contributor=contributor_login, rtype="metrics")
 
-        print(f"\r[{c_users_index}/{len(c_users)}] Analyzing Profile data for {contributor.get('login')}"+' '*40, end = '', flush=True)
+        gx_output.stdout(f"\r[{c_users_index}/{len(c_users)}] Analyzing Profile data for {contributor.get('login')}"+' '*40, end = '', flush=True)
         gx_output.c_log(f"Contributor URL: {contributor.get('html_url')}", rtype="urls")
         gx_output.c_log(f"Owned repositories: https://github.com/{contributor_login}?tab=repositories", rtype="urls")
 
@@ -86,6 +86,8 @@ def run(gx_context, gx_output):
             gx_output.c_log(f"[Blog: {contributor.get('blog')}] obtained from the user's profile.", rtype="personal")
         if contributor.get('location') != None:
             gx_output.c_log(f"[Location: {contributor.get('location')}] obtained from the user's profile.", rtype="personal")
+        if contributor.get('hireable') != None:
+            gx_output.c_log(f"[Hireable: The user has set 'Available for Hire'] in their GitHub profile.", rtype="personal")
 
         if contributor.get('email') != None:
             gx_output.c_log(f"[{contributor.get('email')}] obtained from the user's profile.", rtype="emails")
@@ -126,7 +128,7 @@ def run(gx_context, gx_output):
         signature_attributes = []
         dates_mismatch_commits = []
         commit_times = defaultdict(int)
-        print(f"\r[{c_users_index}/{len(c_users)}] Analyzing {len(commits)} commits and any signing keys for {contributor.get('login')}"+' '*40, end = '', flush=True)
+        gx_output.stdout(f"\r[{c_users_index}/{len(c_users)}] Analyzing {len(commits)} commits and any signing keys for {contributor.get('login')}"+' '*40, end = '', flush=True)
         for commit in commits:
             c = commit["commit"]
 
@@ -371,7 +373,7 @@ def run(gx_context, gx_output):
             gx_output.c_log(f"One of {contributor_login} emails matched the following anonymous users: {matching_anonymous}", rtype="profiling")
 
 
-        print(f"\r[{c_users_index}/{len(c_users)}] Collecting recent (90d) public events for {contributor.get('login')}"+' '*40, end = '', flush=True)
+        gx_output.stdout(f"\r[{c_users_index}/{len(c_users)}] Collecting recent (90d) public events for {contributor.get('login')}"+' '*40, end = '', flush=True)
 
         # Get Public Events generated by this account, if any. GitHub offers up to 90 days of data, which might still be useful.
         public_events = gh_api.fetch_contributor_events(contributor)
@@ -397,6 +399,6 @@ def run(gx_context, gx_output):
     for k,v in unique_anonymous.items():
         gx_output.a_log(f'{k} - {v}', anonymous="#", rtype="anonymous")
 
-    print('\rContributors have been analyzed..'+' '*60, flush=True)
+    gx_output.stdout('\rContributors have been analyzed..'+' '*60, flush=True)
 
     return True

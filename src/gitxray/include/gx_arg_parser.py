@@ -73,6 +73,11 @@ def parse_arguments():
             default=False, 
             help='Enable Debug mode - be prepared for an excessive amount of output.')
 
+    parser.add_argument('--shush', 
+            action='store_true',
+            default=False, 
+            help='Reduced output in stdout, shushing Gitxray to remove any progress output.')
+
     parser.add_argument('-out', '--outfile', 
             type=str, 
             action='store',

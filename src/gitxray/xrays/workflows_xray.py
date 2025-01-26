@@ -1,14 +1,14 @@
-from gitxray.include import gx_definitions, gh_api, gh_time
+from gitxray.include import gx_definitions, gh_time
 from collections import defaultdict
 import base64, re
 
 
-def run(gx_context, gx_output):
-    print("\rRunning verifications on existing Workflows..."+" "*50)
+def run(gx_context, gx_output, gh_api):
+    gx_output.stdout("\rRunning verifications on existing Workflows..."+" "*50)
     repository = gx_context.getRepository()
     contributors = gx_context.getContributors()
 
-    print(f"\rQuerying for repository action workflows.."+" "*50, end="")
+    gx_output.stdout(f"\rQuerying for repository action workflows.."+" "*50, end="")
     workflows = gh_api.fetch_repository_actions_workflows(repository)
     if workflows != None and workflows.get('total_count') > 0:
         gx_output.r_log(f"{workflows.get('total_count')} Workflows available at: [{repository.get('url')}/actions/workflows]", rtype="workflows")
@@ -66,10 +66,10 @@ def run(gx_context, gx_output):
 
                 # https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/
                 if any(a in decoded_content for a in ["pull_request_target","workflow_run","issue_comment","issue:"]):
-                    gx_output.r_log(f"Workflow [{workflow.get('name')}] may be triggered by an event that might be misused by attackers. See more at https://gitxray.com/vulnerable_workflows", rtype="workflows")
+                    gx_output.r_log(f"WARNING: Workflow [{workflow.get('name')}] may be triggered by an event that might be misused by attackers. See more at https://gitxray.com/vulnerable_workflows", rtype="workflows")
 
                 #https://github.com/actions/toolkit/issues/641
-                if "ACTIONS_ALLOW_UNSECURE_COMMANDS: true" in decoded_content: gx_output.r_log(f"Workflow [{workflow.get('name')}] sets ACTIONS_ALLOW_UNSECURE_COMMANDS.", rtype="workflows")
+                if "ACTIONS_ALLOW_UNSECURE_COMMANDS: true" in decoded_content: gx_output.r_log(f"WARNING: Workflow [{workflow.get('name')}] sets ACTIONS_ALLOW_UNSECURE_COMMANDS.", rtype="workflows")
 
                 if "secrets." in decoded_content: 
                     secrets = re.findall(r"secrets\.[A-Za-z-_0-9]*", decoded_content) 
@@ -84,7 +84,7 @@ def run(gx_context, gx_output):
                 if len(user_inputs) > 0: gx_output.r_log(f"Workflow [{workflow.get('name')}] handles user input via: {user_inputs}", rtype="workflows")
 
 
-    print(f"\rQuerying for repository workflow artifacts.."+" "*30, end="")
+    gx_output.stdout(f"\rQuerying for repository workflow artifacts.."+" "*30, end="")
     artifacts = gh_api.fetch_repository_actions_artifacts(repository)
     if artifacts != None and artifacts.get('total_count') > 0:
         gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="artifacts")
@@ -100,5 +100,5 @@ def run(gx_context, gx_output):
                 gx_output.r_log(f"WARNING: An artifact [{artifact.get('name')}] was updated {(updated_at_ts-created_at_ts).days} days after being created: {artifact.get('url')}", rtype="artifacts")
 
 
-    print()
+    gx_output.stdout("")
     return True

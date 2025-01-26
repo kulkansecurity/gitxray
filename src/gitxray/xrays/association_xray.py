@@ -1,7 +1,7 @@
 from gitxray.include import gx_definitions
 
-def run(gx_context, gx_output):
-    print("Checking for potential associations across accounts by cross-referencing all gathered data...")
+def run(gx_context, gx_output, gh_api):
+    gx_output.stdout("Checking for potential associations across accounts by cross-referencing all gathered data...")
 
     collisions = gx_context.getCollisions()
 
