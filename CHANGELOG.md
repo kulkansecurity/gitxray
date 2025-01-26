@@ -2,10 +2,10 @@
 
 ## Release v1.0.17 (January 26th, 2025)
 * Added a new "--shush" parameter which turns "shushable" mode on, discarding any progress output from stdout.
-* Added a new stdout method in gx_output to act as a proxy for print() calls, discarding "shushable" output.
-* Turned gh_api into a class named GitHubRESTAPI which stores a references to gx_output.
-* Added a "WARNING" label/prefix on a couple of Workflow findings which deserve an extra highlight.
 * Added a new finding under the "personal" category which tells if the contributor has enabled "Available for hire" in their profile (docs describe it here: https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-user-account-settings/about-available-for-hire)
+* Added a "WARNING" label/prefix on a couple of Workflow findings which deserve an extra highlight.
+* Turned gh_api into a class named GitHubRESTAPI which stores a reference to gx_output.
+* Added a new stdout method in gx_output to act as a proxy for print() calls, discarding "shushable" output.
 
 ## Release v1.0.16.5 (January 18th, 2025)
 * Fixed an error case (an unhandled exception) that showed up when scanning repositories with a very large list of contributors (e.g. torvalds/linux, or MicrosoftDocs/azure-docs), which leads to GitHub REST APIs responding in an undocumented manner, stating that: "The history or contributor list is too large to list contributors for this repository via the API".
