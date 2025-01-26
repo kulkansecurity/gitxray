@@ -113,10 +113,14 @@ You'll find these optional but very handy in common gitxray usage.
 
 - `-outformat, --output-format [FORMAT]` - Set the format for the log file. Supported formats are `html`, `text` and `json`. Default is `html`. **Example**: `--output-format json`
 
-#### Debug
+#### Shush output
+
+- `--shush` - Makes Gitxray a bit more quiet by not displaying progress-related output. **Example**: `--shush`
+
+#### Debug mode
 
 - `--debug` - Enable Debug mode for a detailed and extensive output. **Example**: `--debug`
-
+  
 # Terms of Use
 
 The user is solely responsible for ensuring that this tool is used in compliance with applicable laws and regulations, including obtaining proper authorization for repository scanning and the distribution of any results generated. Unauthorized use or sharing of results may violate local, national, or international laws.
