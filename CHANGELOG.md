@@ -1,5 +1,9 @@
 # Changelog
 
+## Release v1.0.17.1 (January 30th, 2025)
+* Fixed parsing of legacy workflows which include an empty path attribute.
+* Fixed parsing of broken armored PGP keys which appear to be accepted by GitHub when being added to a user's profile.
+
 ## Release v1.0.17 (January 26th, 2025)
 * Added a new "--shush" parameter which turns "shushable" mode on, discarding any progress output from stdout.
 * Added a new finding under the "personal" category which tells if the contributor has enabled "Available for hire" in their profile (docs describe it here: https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-user-account-settings/about-available-for-hire)
