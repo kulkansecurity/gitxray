@@ -54,7 +54,9 @@ def run(gx_context, gx_output, gh_api):
                     all_c_runs = sum(run_contributors.values())
                     gx_output.r_log(f"Workflow [{workflow.get('name')}] was run by [{all_non_c_runners}] NON-contributors [{all_non_c_runs}] times and by [{all_c_runners}] contributors [{all_c_runs}] times. [{repository.get('html_url')}/actions/workflows/{workflow_file}]", rtype="workflows")
 
-            contents = gh_api.fetch_repository_file_contents(repository, workflow.get('path'))
+            # Workflows may not contain a path - I believe those cases are for legacy workflows, seldom run into them
+            if len(workflow.get('path')) > 0: contents = gh_api.fetch_repository_file_contents(repository, workflow.get('path'))
+            else: contents = {}
             if contents.get('content') != None:
 
                 # We have the contents of a workflow, let's analyze it.
