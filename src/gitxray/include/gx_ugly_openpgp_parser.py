@@ -121,9 +121,8 @@ def ugly_inhouse_openpgp_block(pgp_armored_input):
     base64_str = re.sub(r'Charset: (.+)\r?\n?', '', base64_str)
     base64_str = re.sub(r'Version: (.+)\r?\n?', '', base64_str)
     base64_str = re.sub(r'Comment: (.+)\r?\n?', '', base64_str)
-    base64_str = re.sub(r'-----END PGP SIGNATURE-----|-----END PGP PUBLIC KEY BLOCK-----', '', base64_str)
+    base64_str = re.sub(r'-----END PGP (.+)', '', base64_str)
     base64_str = re.sub(r'\s+', '', base64_str)
-
     decoded_blob = base64.b64decode(base64_str.encode('ascii', 'ignore'))
 
     try:
