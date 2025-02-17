@@ -20,7 +20,7 @@ def gitxray_cli():
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
 gitxray: X-Ray and analyze GitHub Repositories and their Contributors. Trust no one!
-v1.0.17.1 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+v1.0.17.2 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
