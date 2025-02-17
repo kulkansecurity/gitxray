@@ -1,7 +1,7 @@
 # Changelog
 
 ## Release v1.0.17.2 (February 16th, 2025)
-* Added a Highlighted findings section to the HTML report. Special thanks to XXXXXX for their feedback.
+* Added a Highlighted findings section to the HTML report. Special thanks to Viktor and Darin from DevOps Paradox for their feedback.
 * Added to every table in the HTML report the ability to collapse and expand.
 * Merged the finding on similar repository names with the finding on the repository being the most starred.
 * Improved the introduction section of the HTML report to guide users with sample use-cases for Gitxray.
