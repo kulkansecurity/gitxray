@@ -1,5 +1,11 @@
 # Changelog
 
+## Release v1.0.17.2 (February 16th, 2025)
+* Added a Highlighted findings section to the HTML report. Special thanks to XXXXXX for their feedback.
+* Added to every table in the HTML report the ability to collapse and expand.
+* Merged the finding on similar repository names with the finding on the repository being the most starred.
+* Improved the introduction section of the HTML report to guide users with sample use-cases for Gitxray.
+
 ## Release v1.0.17.1 (January 30th, 2025)
 * Fixed parsing of legacy workflows which include an empty path attribute.
 * Fixed parsing of broken armored PGP keys which appear to be accepted by GitHub when being added to a user's profile.
