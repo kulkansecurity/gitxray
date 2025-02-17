@@ -16,12 +16,14 @@ def run(gx_context, gx_output, gh_api):
         most_rated = similar_names.get('items')[0]
         search_url = f"https://github.com/search?q={repository.get('name')}%20in:name&type=repositories&s=stars&o=desc"
         if most_rated.get('full_name') == repository.get('full_name'):
-            gx_output.r_log(f"This is the highest rating repository with name [{repository.get('name')}]", rtype="profiling")
+            reponame_msg = f"This is the highest rating repository with name [{repository.get('name')}]"
         else:
-            gx_output.r_log(f"WARNING: This is NOT the highest rating repository with name [{repository.get('name')}]", rtype="profiling")
+            reponame_msg = f"WARNING: This is NOT the highest rating repository with name [{repository.get('name')}]"
 
-        if similar_names.get('total_count') > 1:
-            gx_output.r_log(f'{similar_names.get("total_count")} repositories with a similar name were discovered - See them here: {search_url}', 'profiling')
+        if similar_names.get('total_count') > 0:
+            gx_output.r_log(f'{reponame_msg}. {similar_names.get("total_count")} repositories with a similar name were discovered - See them here: {search_url}', 'profiling')
+        else:
+            gx_output.r_log(f'{reponame_msg}', 'profiling')
 
     stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
     if repository.get('stargazers_count') > 0:
