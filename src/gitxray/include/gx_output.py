@@ -164,20 +164,23 @@ class Output:
         # Load all template files
         templates = {
             name: open(os.path.join(TEMPLATE_DIR, f"template_{name}.html"), "r", encoding="utf-8").read()
-            for name in ["main", "repository", "contributor", "non_contributor", "table"]
+            for name in ["main", "repository", "contributor", "non_contributor", "table", "highlights"]
         }
 
         category_sections = ""
         contributor_sections = ""
         more_sections = ""
+        highlights_section = ""
         repository_sections = ""
         repository_sidebar_links = ""
         contributor_sidebar_links = ""
         category_sidebar_links = ""
         more_sidebar_links = ""
+        highlights_rows = []
 
         for entity, data in self._repositories.items():
-            sanitized_entity = self.html_data_sanitize_and_process(entity)
+            sanitized_entity_raw = self.html_data_sanitize_and_process(entity)
+            sanitized_entity = sanitized_entity_raw.replace("/","_")
             r_template = templates['repository'].replace("{{repository_id}}", str(sanitized_entity))
 
             r_tables = []
@@ -186,6 +189,7 @@ class Output:
                 if not self.debug_enabled() and ("debug" in rtype.lower()): continue
                 data_rows = []
                 for line in data[rtype]:
+                    if "warning: " in line.lower(): highlights_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
                     if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {line.lower()}' for f in self._filters)): continue
                     data_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
 
@@ -194,7 +198,7 @@ class Output:
                     r_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "repository_"+str(sanitized_entity)+"_"+rtype))
 
             if len(r_tables) > 0:
-                repository_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128193;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                repository_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity_raw)+' &#128193;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
                 repository_sidebar_links += "".join(r_sidebar_links)
                 repository_sidebar_links += '</ul></div></li></ul>'
                 r_template = r_template.replace("{{repository_tables}}", "".join(r_tables))
@@ -245,6 +249,7 @@ class Output:
                 if not self.debug_enabled() and ("debug" in rtype.lower()): continue
                 data_rows = []
                 for line in data[rtype]:
+                    if "warning: " in line.lower(): highlights_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
                     if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {line.lower()}' for f in self._filters)): continue
                     data_rows.append(f"<tr><td>{sanitized_entity}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
 
@@ -269,6 +274,7 @@ class Output:
                 for rtype in data.keys():
                     data_rows = []
                     for line in data[rtype]:
+                        if "warning: " in line.lower(): highlights_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
                         if self._filters != None and (all(f.lower() not in f'{rtype.lower()} {line.lower()}' for f in self._filters)): continue
                         data_rows.append(f"<tr><td>{rtype}</td><td>{self.html_data_sanitize_and_process(line)}</td></tr>")
 
@@ -310,6 +316,10 @@ class Output:
             more_sections += table_html
 
 
+        # We now have all highlights under highlights_rows; let's fill the highlights table and section of the report
+        if len(highlights_rows) > 0:
+            highlights_section = templates['table'].replace("{{table_rows}}", "".join(highlights_rows)).replace("{{table_title}}", "Highlights").replace("{{table_id}}", "highlights")
+        else: highlights_section = "<br/><h5>No results were highlighted by Gitxray.</h5>"
 
         output = templates['main'].replace("{{repository_sections}}", repository_sections)
         # repository sidebar links
@@ -320,6 +330,9 @@ class Output:
         output = output.replace("{{contributor_sidebar_links}}", contributor_sidebar_links)
         # more sidebar links
         output = output.replace("{{more_sidebar_links}}", more_sidebar_links)
+
+        # highlights section
+        output = output.replace("{{highlights_section}}", highlights_section)
 
         output = output.replace("{{category_sections}}", category_sections)
         output = output.replace("{{contributor_sections}}", contributor_sections)
