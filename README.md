@@ -3,7 +3,7 @@ Gitxray (short for Git X-Ray) is a multifaceted security tool designed for use o
 
 [![Build Workflows](https://github.com/kulkansecurity/gitxray/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kulkansecurity/gitxray) [![Latest Version in PIP](https://img.shields.io/pypi/v/gitxray.svg)](https://pypi.org/project/gitxray) [![Python Versions](https://img.shields.io/pypi/pyversions/gitxray.svg)](https://pypi.org/project/gitxray) [![License](https://img.shields.io/pypi/l/gitxray.svg)](https://github.com/kulkansecurity/gitxray/blob/main/LICENSE) 
 --- 
-![Gitxray HTML Report](https://kulkansecurity.github.io/gitxray/images/html_report_gitxray.png "Gitxray HTML Report")
+![Gitxray Sample HTML Report](https://kulkansecurity.github.io/gitxray/images/html_report_gitxray.png "Gitxray Sample HTML Report")
 <div style="clear: both;"></div>
 
 # Use cases
