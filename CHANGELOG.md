@@ -1,5 +1,8 @@
 # Changelog
 
+## Release v1.0.17.3 (March 2nd, 2025)
+* Added handling of Blocked repositories. The GitHub API presents a different error than for not-found repos, and includes a reason; which we now include in our reports. Thanks to @satoridev01 for reporting the behavior.
+
 ## Release v1.0.17.2 (February 16th, 2025)
 * Added a Highlighted findings section to the HTML report. Special thanks to Viktor and Darin from DevOps Paradox for their feedback.
 * Added to every table in the HTML report the ability to collapse and expand.
