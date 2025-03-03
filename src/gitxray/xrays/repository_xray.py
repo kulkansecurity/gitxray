@@ -26,7 +26,7 @@ def run(gx_context, gx_output, gh_api):
             gx_output.r_log(f'{reponame_msg}', 'profiling')
 
     stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
-    if repository.get('stargazers_count') > 0:
+    if repository.get('stargazers_count', 0) > 0:
         stargazers_message += f" List at: {repository.get('stargazers_url')}"
     gx_output.r_log(stargazers_message, rtype="profiling")
 
@@ -43,7 +43,7 @@ def run(gx_context, gx_output, gh_api):
     # https://api.github.com/repos/infobyte/faraday/issues/comments - and won't allow filtering in a helpful (to us) way
     gx_output.stdout(f"\rGetting all repository comments on commits.."+" "*40, end="")
     commit_comments = gh_api.fetch_repository_commit_comments(repository)
-    if len(commit_comments) > 0: 
+    if isinstance(commit_comments, list) and len(commit_comments) > 0: 
         total_comments = defaultdict(int)
         positive_reactions = defaultdict(int)
         negative_reactions = defaultdict(int)
@@ -86,7 +86,7 @@ def run(gx_context, gx_output, gh_api):
     
     gx_output.stdout(f"\rGetting all repository comments on issues.."+" "*30, end="")
     issues_comments = gh_api.fetch_repository_issues_comments(repository)
-    if issues_comments != None and len(issues_comments) > 0: 
+    if isinstance(issues_comments, list) and len(issues_comments) > 0: 
         total_comments = defaultdict(int)
         positive_reactions = defaultdict(int)
         negative_reactions = defaultdict(int)
@@ -127,7 +127,7 @@ def run(gx_context, gx_output, gh_api):
 
     gx_output.stdout(f"\rGetting all repository comments on pull requests.."+" "*30, end="")
     pulls_comments = gh_api.fetch_repository_pulls_comments(repository)
-    if pulls_comments != None and len(pulls_comments) > 0: 
+    if isinstance(pulls_comments, list) and len(pulls_comments) > 0: 
         total_comments = defaultdict(int)
         positive_reactions = defaultdict(int)
         negative_reactions = defaultdict(int)
@@ -184,12 +184,12 @@ def run(gx_context, gx_output, gh_api):
             #print(gh_api.fetch_environment_protection_rules(repository, environment.get('name')))
 
     gx_output.stdout(f"\rChecking for repository forks.."+" "*30, end="")
-    if repository.get('forks_count') > 0:
+    if repository.get('forks_count', 0) > 0:
         gx_output.r_log(f"Repository has {repository.get('forks_count')} forks: {repository.get('forks_url')}", rtype="profiling")
 
     gx_output.stdout(f"\rInspecting repository branches.."+" "*40, end="")
     branches = gh_api.fetch_repository_branches(repository)
-    if branches != None and len(branches) > 0: 
+    if isinstance(branches, list) and len(branches) > 0: 
         gx_output.r_log(f"{len(branches)} Branches available at: [{repository.get('html_url')}/branches]", rtype="branches")
         unprotected_branches = []
         protected_branches = []
@@ -204,7 +204,7 @@ def run(gx_context, gx_output, gh_api):
 
     gx_output.stdout(f"\rInspecting repository labels.."+" "*40, end="")
     labels = gh_api.fetch_repository_labels(repository)
-    if labels != None and len(labels) > 0: 
+    if isinstance(labels, list) and len(labels) > 0: 
         gx_output.r_log(f"{len(labels)} Labels available at: [{repository.get('html_url')}/labels]", rtype="labels")
         non_default_labels = [label.get('name') for label in labels if label.get('default') == False]
         if len(non_default_labels) > 0:
@@ -212,7 +212,10 @@ def run(gx_context, gx_output, gh_api):
 
     gx_output.stdout(f"\rInspecting repository tags.."+" "*40, end="")
     tags = gh_api.fetch_repository_tags(repository)
-    if tags != None and len(tags) > 0: gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="tags")
+    if isinstance(tags, list) and len(tags) > 0: 
+        gx_output.r_log(f"{len(tags)} Tags available at: [{repository.get('html_url')}/tags]", rtype="tags")
+    else:
+        tags = []
     tag_taggers = defaultdict(int)
 
     """ A bit shameful here because we can't really get too much data out of tags because of the way the GH API is implemented.
@@ -236,7 +239,8 @@ def run(gx_context, gx_output, gh_api):
 
     gx_output.stdout(f"\rInspecting repository releases.."+" "*40, end="")
     releases = gh_api.fetch_repository_releases(repository)
-    if len(releases) > 0: gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="releases")
+    if isinstance(releases, list) and len(releases) > 0: 
+        gx_output.r_log(f"{len(releases)} Releases available at: [{repository.get('html_url')}/releases]", rtype="releases")
 
     release_authors = defaultdict(int)
     asset_uploaders = defaultdict(int)
@@ -345,11 +349,11 @@ def run(gx_context, gx_output, gh_api):
         """
 
     watchers_message = f"Watchers count: [{repository.get('subscribers_count')}]"
-    if repository.get('subscribers_count') > 0:
+    if repository.get('subscribers_count', 0) > 0:
         watchers_message += f" List at: {repository.get('subscribers_url')}"
     gx_output.r_log(watchers_message, rtype="profiling")
 
-    if repository.get('open_issues_count') > 0:
+    if repository.get('open_issues_count', 0) > 0:
         gx_output.r_log(f"Repository has {repository.get('open_issues_count')} Open Issues: {repository.get('html_url')}/issues", rtype="profiling")
 
     if repository.get('description'):
@@ -358,7 +362,7 @@ def run(gx_context, gx_output, gh_api):
     if repository.get('topics'):
         gx_output.r_log(f"Topics: {str(repository.get('topics'))}", rtype="profiling")
 
-    if repository.get('fork') != False:
+    if repository.get('fork') != False and repository.get('fork') != None:
         parent = repository.get('parent').get('full_name')
         source = repository.get('source').get('full_name')
         gx_output.stdout(f"\rRepository is a FORK of a parent named: {repository.get('parent').get('full_name')}: {repository.get('parent')['html_url']}")
@@ -369,14 +373,14 @@ def run(gx_context, gx_output, gh_api):
             gx_output.r_log(f"The parent of this fork comes from SOURCE repo: {repository.get('source')['html_url']}", rtype="fork")
 
 
-    days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('created_at'))).days 
+    days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('created_at', datetime.utcnow().isoformat()))).days 
     message = f"{days} days old"
     if days > 365:
         years = "{:.2f}".format(days / 365)
         message = f"{years} years old"
     gx_output.r_log(f"Repository created: {repository.get('created_at')}, is {message}.", rtype="profiling")
 
-    days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('updated_at'))).days 
+    days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('updated_at', datetime.utcnow().isoformat()))).days 
     message = f"{days} days ago"
     if days > 365:
         years = "{:.2f}".format(days / 365)
@@ -393,7 +397,7 @@ def run(gx_context, gx_output, gh_api):
         gx_output.r_log(f"Repository's visibility is set to [private]", rtype="profiling")
 
     public_events = gh_api.fetch_repository_public_events(repository)
-    if len(public_events) > 0:
+    if isinstance(public_events, list) and len(public_events) > 0:
         gh_public_events.log_events(public_events, gx_output, for_repository=True)
 
     if repository.get('organization'):
@@ -409,66 +413,67 @@ def run(gx_context, gx_output, gh_api):
     submitter_contrib_counts = defaultdict(lambda: {'submitted': 0, 'accepted':0, 'open': 0, 'rejected': 0})
     submitter_notcontrib_counts = defaultdict(lambda: {'submitted': 0, 'accepted':0, 'open': 0, 'rejected': 0})
     clogins = [c.get('login') for c in contributors]
-    for pr in prs:
-        try: # quick ugly patch instead of checking all types are dict and keys exist.
-            submitter = pr['user']['login']
-        except: 
-            continue
-        is_merged = pr['merged_at'] is not None
-        if submitter not in clogins: 
-            submitter_counts = submitter_notcontrib_counts
-        else:
-            submitter_counts = submitter_contrib_counts
-
-        submitter_counts[submitter]['submitted'] += 1
-
-        if is_merged:
-            submitter_counts[submitter]['accepted'] += 1
-        elif pr['state'] == 'closed':
-            submitter_counts[submitter]['rejected'] += 1
-        else:
-            submitter_counts[submitter]['open'] += 1
-
-    for submitter_counts in [submitter_contrib_counts, submitter_notcontrib_counts]:
-        for user, details in submitter_counts.items():
-            if details['submitted'] > 0:
-                # Only add a link to the URL of PRs if it belongs to a user account
-                if user in clogins:
-                    gx_output.c_log(f"{details['submitted']} Pull Requests by [{user}] at: {repository.get('html_url')}/pulls?q=author%3a{user}", rtype="prs", contributor=user)
-                details['rejected_percent'] = (details['rejected'] / details['submitted']) * 100
+    if isinstance(prs, list) and len(prs) > 0:
+        for pr in prs:
+            try: # quick ugly patch instead of checking all types are dict and keys exist.
+                submitter = pr['user']['login']
+            except: 
+                continue
+            is_merged = pr['merged_at'] is not None
+            if submitter not in clogins: 
+                submitter_counts = submitter_notcontrib_counts
             else:
-                details['rejected_percent'] = 0
+                submitter_counts = submitter_contrib_counts
+    
+            submitter_counts[submitter]['submitted'] += 1
 
-            # Used GPT for this, we're automathgically weighting amount AND percentage, and it appears to be working.
-            details['rejected_score'] = details['rejected_percent'] * math.log1p(details['rejected'])
+            if is_merged:
+                submitter_counts[submitter]['accepted'] += 1
+            elif pr['state'] == 'closed':
+                submitter_counts[submitter]['rejected'] += 1
+            else:
+                submitter_counts[submitter]['open'] += 1
 
-    sorted_submitters_contrib_rejected = sorted(submitter_contrib_counts.items(), key=lambda x: (-x[1]['rejected_score'], -x[1]['submitted']))
-    sorted_submitters_notcontrib_rejected = sorted(submitter_notcontrib_counts.items(), key=lambda x: (-x[1]['rejected_score'], -x[1]['submitted']))
+        for submitter_counts in [submitter_contrib_counts, submitter_notcontrib_counts]:
+            for user, details in submitter_counts.items():
+                if details['submitted'] > 0:
+                    # Only add a link to the URL of PRs if it belongs to a user account
+                    if user in clogins:
+                        gx_output.c_log(f"{details['submitted']} Pull Requests by [{user}] at: {repository.get('html_url')}/pulls?q=author%3a{user}", rtype="prs", contributor=user)
+                    details['rejected_percent'] = (details['rejected'] / details['submitted']) * 100
+                else:
+                    details['rejected_percent'] = 0
+    
+                # Used GPT for this, we're automathgically weighting amount AND percentage, and it appears to be working.
+                details['rejected_score'] = details['rejected_percent'] * math.log1p(details['rejected'])
+   
+        sorted_submitters_contrib_rejected = sorted(submitter_contrib_counts.items(), key=lambda x: (-x[1]['rejected_score'], -x[1]['submitted']))
+        sorted_submitters_notcontrib_rejected = sorted(submitter_notcontrib_counts.items(), key=lambda x: (-x[1]['rejected_score'], -x[1]['submitted']))
 
-    # First loop on top 3 to log in Repository output
-    message = []
-    for user, details in sorted_submitters_contrib_rejected[:3]:
-        if details['rejected'] > 0:
-            message.append(f"[{user} {details['rejected']} rejected out of {details['submitted']}]")
-    if len(message) > 0:
-        gx_output.r_log(f"Top repository contributors with rejected PRs: " + " | ".join(message), rtype="contributors")
+        # First loop on top 3 to log in Repository output
+        message = []
+        for user, details in sorted_submitters_contrib_rejected[:3]:
+            if details['rejected'] > 0:
+                message.append(f"[{user} {details['rejected']} rejected out of {details['submitted']}]")
+        if len(message) > 0:
+            gx_output.r_log(f"Top repository contributors with rejected PRs: " + " | ".join(message), rtype="contributors")
 
-    # Now for NON contributors
-    message = []
-    for user, details in sorted_submitters_notcontrib_rejected[:3]:
-        if details['rejected'] > 0:
-            message.append(f"[{user} {details['rejected']} rejected out of {details['submitted']}]")
-    if len(message) > 0:
-        gx_output.r_log(f"Top non-contributor GitHub users with rejected PRs: " + " | ".join(message), rtype="contributors")
+        # Now for NON contributors
+        message = []
+        for user, details in sorted_submitters_notcontrib_rejected[:3]:
+            if details['rejected'] > 0:
+                message.append(f"[{user} {details['rejected']} rejected out of {details['submitted']}]")
+        if len(message) > 0:
+            gx_output.r_log(f"Top non-contributor GitHub users with rejected PRs: " + " | ".join(message), rtype="contributors")
 
-    # And now loop on all to log under each user account.
-    for user, details in submitter_contrib_counts.items():
-        if details['rejected'] > 0:
-            gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['rejected']} were rejected.", rtype="profiling", contributor=user)
-        if details['accepted'] > 0:
-            gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['accepted']} were merged.", rtype="profiling", contributor=user)
-        if details['open'] > 0:
-            gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['open']} remain open.", rtype="profiling", contributor=user)
+        # And now loop on all to log under each user account.
+        for user, details in submitter_contrib_counts.items():
+            if details['rejected'] > 0:
+                gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['rejected']} were rejected.", rtype="profiling", contributor=user)
+            if details['accepted'] > 0:
+                gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['accepted']} were merged.", rtype="profiling", contributor=user)
+            if details['open'] > 0:
+                gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['open']} remain open.", rtype="profiling", contributor=user)
 
     # Check if there were any users with mismatches in commits dates in the repository.
     for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS").items():

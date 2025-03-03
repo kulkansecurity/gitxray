@@ -10,7 +10,7 @@ def run(gx_context, gx_output, gh_api):
 
     gx_output.stdout(f"\rQuerying for repository action workflows.."+" "*50, end="")
     workflows = gh_api.fetch_repository_actions_workflows(repository)
-    if workflows != None and workflows.get('total_count') > 0:
+    if workflows != None and workflows.get('total_count', 0) > 0:
         gx_output.r_log(f"{workflows.get('total_count')} Workflows available at: [{repository.get('url')}/actions/workflows]", rtype="workflows")
         for workflow in workflows.get('workflows'):
             workflow_file = workflow.get('path').split('/')[-1]
@@ -88,7 +88,7 @@ def run(gx_context, gx_output, gh_api):
 
     gx_output.stdout(f"\rQuerying for repository workflow artifacts.."+" "*30, end="")
     artifacts = gh_api.fetch_repository_actions_artifacts(repository)
-    if artifacts != None and artifacts.get('total_count') > 0:
+    if artifacts != None and artifacts.get('total_count', 0) > 0:
         gx_output.r_log(f"{artifacts.get('total_count')} Artifacts available at: [{repository.get('url')}/actions/artifacts]", rtype="artifacts")
         for artifact in artifacts.get('artifacts'):
             gx_output.r_log(f"Artifact [{artifact.get('name')}] created [{artifact.get('created_at')}], updated [{artifact.get('updated_at')}]: {artifact.get('url')}", rtype="artifacts")
