@@ -238,7 +238,7 @@ class GitHubRESTAPI:
         return self.github_request_json(f"{self.GITHUB_API_BASE_URL}/repos/{repo.get('full_name')}/environments/{environment}/deployment_protection_rules")
 
     def fetch_repository_pull_requests(self, repo):
-        return self.github_request_json(repo.get('pulls_url').replace("{/number}",""), {'state':'all'})
+        return self.github_request_json(repo.get('pulls_url', str()).replace("{/number}",""), {'state':'all'})
 
     def fetch_repository_issues(self, repo):
         return self.github_request_json(repo.get('issues_url').replace("{/number}",""), {'state':'all'})
