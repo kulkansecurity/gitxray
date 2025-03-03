@@ -67,6 +67,7 @@ class Context:
         return
 
     def setContributors(self, contributors):
+        if contributors is None: contributors = []
         self._contributors = contributors
         return
 
