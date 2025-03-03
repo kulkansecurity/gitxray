@@ -20,7 +20,7 @@ def gitxray_cli():
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
 gitxray: X-Ray and analyze GitHub Repositories and their Contributors. Trust no one!
-v1.0.17.2 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+v1.0.17.3 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
@@ -70,17 +70,20 @@ v1.0.17.2 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing 
     try:
         for repo in gx_context.getRepositoryTargets():
             r_started_at = datetime.datetime.now()
-            try:
-                repository = gh_api.fetch_repository(repo)
-                gx_output.r_log(f"X-Ray on repository started at: {r_started_at}", repository=repository.get('full_name'), rtype="metrics")
-                gx_output.stdout("#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
-                gx_output.stdout("Now verifying repository: {}".format(repository.get('full_name')))
-            except Exception as ex:
-                print("Unable to pull data for the repository that was provided. Is it a valid repo URL?")
-                if gx_context.debugEnabled():
-                    print(ex)
-                sys.exit()
-    
+
+            repository = gh_api.fetch_repository(repo)
+            if "full_name" not in repository.keys():
+                if "block" in repository.keys(): repository["full_name"] = "/".join(repo.rstrip("/").split("/")[-2:])
+                else: 
+                    print("Unable to pull data for the repository that was provided. Is it a valid repo URL?")
+                    sys.exit()
+
+            gx_output.r_log(f"X-Ray on repository started at: {r_started_at}", repository=repository.get('full_name'), rtype="metrics")
+            gx_output.stdout("#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
+            gx_output.stdout("Now verifying repository: {}".format(repository.get('full_name')))
+  
+            if "block" in repository.keys(): gx_output.r_log(f"WARNING: The repository was DISABLED and BLOCKED by GitHub. Reason: {repository['block']['reason']}", rtype="profiling")
+
             # Let's keep track of the repository that we're X-Raying
             gx_context.setRepository(repository)
 
@@ -89,7 +92,6 @@ v1.0.17.2 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing 
 
             # Now call our xray modules! Specifically by name, until we make this more plug and play
             # The standard is that a return value of False leads to skipping additional modules
-    
             if not contributors_xray.run(gx_context, gx_output, gh_api): continue
             if not repository_xray.run(gx_context, gx_output, gh_api): continue
             if not workflows_xray.run(gx_context, gx_output, gh_api): continue
