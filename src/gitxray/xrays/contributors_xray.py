@@ -52,7 +52,7 @@ def run(gx_context, gx_output, gh_api):
             print(c)
             raise Exception("Contributor of Type !== User/Anonymous found. Failing almost gracefully")
 
-    if contributor_scope == None:
+    if contributor_scope == None and len(gx_context.getContributors()) != 0:
         gx_output.stdout(f"\r\nDiscovered {len(c_users)} contributors with GitHub User accounts, and {len(c_anon)} Anonymous contributors", end='', flush=True)
         gx_output.r_log(f"Repository has {len(c_anon)} Anonymous contributors.", rtype="contributors")
         gx_output.r_log(f"Repository has {len(c_users)} contributors with GitHub User accounts.", rtype="contributors")
