@@ -1,5 +1,9 @@
 # Changelog
 
+## Release v1.0.17.4 (April 27th, 2025)
+* Removed external links to Bootstrap CSS, JavaScript, and the Gitxray logo; now all assets (styles, scripts, images) are embedded so HTML reports are fully self-contained.
+* Merged a PR by satoridev01 which prevents Gitxray from printing stars, watchers, created, updated, contributors and anonymous if they were not found, as opposed to stating "0".
+
 ## Release v1.0.17.3 (March 2nd, 2025)
 * Added handling of Blocked repositories. The GitHub API presents a different error than for not-found repos, and includes a reason; which we now include in our reports. Thanks to @satoridev01 for reporting the behavior.
 
