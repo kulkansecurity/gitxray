@@ -31,3 +31,6 @@ gitxray = "gitxray.gitxray:gitxray_cli"
 
 [tool.setuptools.package-data]
 "gitxray" = ["include/html_report/*.html"]
+
+[tool.setuptools]
+license-files = []
