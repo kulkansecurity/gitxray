@@ -6,54 +6,17 @@
     <title>Gitxray Report</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-
     <style>
-        body {
-            padding-top: 20px;
-            padding-bottom: 20px;
+        body { padding-top: 20px; padding-bottom: 20px; }
+        .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: 260px; background-color: #f8f9fa; padding-top: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; }
+        .sidebar a { display: block; padding: 10px 20px; color: #333; text-decoration: none; }
+        .sidebar a:hover { background-color: #e9ecef; color: #000; }
+	.sidebar-header { font-weight: bold; padding: 0.5rem 1rem; color: #ffffff; background-color: #007bff; border-radius: 0.25rem; }
+        @media (max-width: 768px) { 
+		.sidebar { width: 100%; height: auto; position: relative; }
+		.content { margin-left: 0; }
         }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 260px;
-            background-color: #f8f9fa;
-            padding-top: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        .sidebar a {
-            display: block;
-            padding: 10px 20px;
-            color: #333;
-            text-decoration: none;
-        }
-        .sidebar a:hover {
-            background-color: #e9ecef;
-            color: #000;
-        }
-
-	.sidebar-header {
-	font-weight: bold;
-	padding: 0.5rem 1rem;
-	color: #ffffff;
-	background-color: #007bff;
-	border-radius: 0.25rem;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .content {
-                margin-left: 0;
-            }
-        }
-        .highlight-warning {
-           background-color: yellow !important;  
-        }
+        .highlight-warning { background-color: yellow !important;  }
     </style>
 </head>
 <body>
@@ -169,10 +132,26 @@
     </div>
 	</div>
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
-
 	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+          document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(trigger) {
+            trigger.addEventListener('click', function(event) {
+              const selector = this.getAttribute('data-bs-target') || this.getAttribute('href');
+              if (!selector) return;
+              const target = document.querySelector(selector);
+              if (target) {
+                        if (target.classList.contains('show')) {
+                          target.classList.remove('show');
+                          target.style.display = 'none';
+                } else {
+                          target.classList.add('show');
+                          target.style.display = 'block';
+                }
+              }
+            });
+          });
+        });
+
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('table').forEach((table) => {
             const searchContainer = document.createElement('div');
