@@ -25,10 +25,11 @@ def run(gx_context, gx_output, gh_api):
         else:
             gx_output.r_log(f'{reponame_msg}', 'profiling')
 
-    stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
-    if repository.get('stargazers_count', 0) > 0:
-        stargazers_message += f" List at: {repository.get('stargazers_url')}"
-    gx_output.r_log(stargazers_message, rtype="profiling")
+    if repository.get('stargazers_count') is not None:
+        stargazers_message = f"Stars count: [{repository.get('stargazers_count')}]"
+        if repository.get('stargazers_count', 0) > 0:
+            stargazers_message += f" List at: {repository.get('stargazers_url')}"
+        gx_output.r_log(stargazers_message, rtype="profiling")
 
     if repository.get('owner'):
         gx_output.r_log(f"Repository owner account is [{repository.get('owner').get('login')}]: {repository.get('owner').get('html_url')}", rtype="profiling")
@@ -348,10 +349,11 @@ def run(gx_context, gx_output, gh_api):
                             print(f"Group length: {len(group)} - Group ID: {group_key}: Range {range_start} to {range_end}, Members: {len(group)}, Logins: {logins}")
         """
 
-    watchers_message = f"Watchers count: [{repository.get('subscribers_count')}]"
-    if repository.get('subscribers_count', 0) > 0:
-        watchers_message += f" List at: {repository.get('subscribers_url')}"
-    gx_output.r_log(watchers_message, rtype="profiling")
+    if repository.get('subscribers_count') is not None:
+        watchers_message = f"Watchers count: [{repository.get('subscribers_count')}]"
+        if repository.get('subscribers_count', 0) > 0:
+            watchers_message += f" List at: {repository.get('subscribers_url')}"
+        gx_output.r_log(watchers_message, rtype="profiling")
 
     if repository.get('open_issues_count', 0) > 0:
         gx_output.r_log(f"Repository has {repository.get('open_issues_count')} Open Issues: {repository.get('html_url')}/issues", rtype="profiling")
@@ -373,19 +375,21 @@ def run(gx_context, gx_output, gh_api):
             gx_output.r_log(f"The parent of this fork comes from SOURCE repo: {repository.get('source')['html_url']}", rtype="fork")
 
 
-    days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('created_at', datetime.utcnow().isoformat()))).days 
-    message = f"{days} days old"
-    if days > 365:
-        years = "{:.2f}".format(days / 365)
-        message = f"{years} years old"
-    gx_output.r_log(f"Repository created: {repository.get('created_at')}, is {message}.", rtype="profiling")
+    if repository.get('created_at') is not None:
+        days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('created_at', datetime.utcnow().isoformat()))).days 
+        message = f"{days} days old"
+        if days > 365:
+            years = "{:.2f}".format(days / 365)
+            message = f"{years} years old"
+        gx_output.r_log(f"Repository created: {repository.get('created_at')}, is {message}.", rtype="profiling")
 
-    days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('updated_at', datetime.utcnow().isoformat()))).days 
-    message = f"{days} days ago"
-    if days > 365:
-        years = "{:.2f}".format(days / 365)
-        message = f"{years} years ago"
-    gx_output.r_log(f"Repository last updated: {repository.get('updated_at')}, {message}.", rtype="profiling")
+    if repository.get('updated_at') is not None:
+        days = (datetime.now(timezone.utc) - gh_time.parse_date(repository.get('updated_at', datetime.utcnow().isoformat()))).days 
+        message = f"{days} days ago"
+        if days > 365:
+            years = "{:.2f}".format(days / 365)
+            message = f"{years} years ago"
+        gx_output.r_log(f"Repository last updated: {repository.get('updated_at')}, {message}.", rtype="profiling")
 
     if repository.get('archived') == True:
         gx_output.r_log(f"Repository is archived and therefore likely no longer maintained.", rtype="profiling")
