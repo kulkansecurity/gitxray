@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.gitxray.com/installing/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Installing and Updating Gitxray - Gitxray</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Installing and Updating Gitxray";
+        var mkdocs_page_input_path = "installing.md";
+        var mkdocs_page_url = "/installing/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Gitxray
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Installing and Updating Gitxray</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#pypi-pip-way">PyPI (PIP) Way</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-an-access-token-to-increase-rate-limits">Creating an Access Token to increase Rate Limits</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#command-line-arguments">Command Line Arguments</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#required-arguments">Required Arguments</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#optional-arguments">Optional Arguments</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#output-and-formats">Output and Formats</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#debug">Debug</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../features/">Features &#128171;</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../vulnerable_workflows/">Vulnerable Workflows</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../code_structure/">Code structure</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../gitxray_buzz/">Gitxray Buzz</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Gitxray</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Installing and Updating Gitxray</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/kulkansecurity/gitxray/edit/master/docs/installing.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="installing-and-updating-gitxray">Installing and Updating Gitxray<a class="headerlink" href="#installing-and-updating-gitxray" title="Permanent link"></a></h1>
+<p>gitxray was written with no use of external package dependencies other than the <code>requests</code> library.</p>
+<h2 id="pypi-pip-way">PyPI (PIP) Way<a class="headerlink" href="#pypi-pip-way" title="Permanent link"></a></h2>
+<p><code>gitxray</code> is on PyPI and can be installed and updated with:</p>
+<pre><code class="language-bash">pip install gitxray --upgrade
+</code></pre>
+<p>Once installed, simply run gitxray from your command line by typing:</p>
+<pre><code class="language-bash">gitxray -o https://github.com/SampleOrg
+</code></pre>
+<p>or</p>
+<pre><code class="language-bash">gitxray -r https://github.com/SampleOrg/SampleRepo
+</code></pre>
+<p>Including https://github.com/ in the Repository or Organization is optional.</p>
+<h2 id="installing-from-source">Installing from source<a class="headerlink" href="#installing-from-source" title="Permanent link"></a></h2>
+<p>You may also run <code>gitxray</code> directly by cloning or downloading its GitHub <a href="https://github.com/kulkansecurity/gitxray/">repository</a> and running:</p>
+<pre><code class="language-bash">python3 -m pip install -r requirements.txt
+cd src/
+python3 -m gitxray.gitxray
+</code></pre>
+<h2 id="creating-an-access-token-to-increase-rate-limits">Creating an Access Token to increase Rate Limits<a class="headerlink" href="#creating-an-access-token-to-increase-rate-limits" title="Permanent link"></a></h2>
+<p>Gitxray gracefully handles Rate Limits and can work out of the box without a GitHub API token, but you'll likely hit RateLimits pretty fast (A small to medium-size repository with 10+ Contributors could take hours to complete while it waits for RateLimits to reset) This is detailed by GitHub in their <a href="https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users">documentation here</a>. </p>
+<p><a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token">Creating a simple read-only token scoped to PUBLIC repositories</a> will however help you increase those restrictions considerably. If you're not in a hurry or can leave gitxray running you'll be able to use its full capacity, as it pauses execution while waiting for the limits to lift.</p>
+<p>You may then load the token safely by using (prevents the token from being displayed on screen or getting logged in your shell history):</p>
+<pre><code class="language-bash">read -rs GH_ACCESS_TOKEN
+export
+</code></pre>
+<h2 id="command-line-arguments">Command Line Arguments<a class="headerlink" href="#command-line-arguments" title="Permanent link"></a></h2>
+<h3 id="required-arguments">Required Arguments<a class="headerlink" href="#required-arguments" title="Permanent link"></a></h3>
+<p>One of the following must be specified:</p>
+<ul>
+<li>
+<p><code>-r, --repository [URL]</code> - Specify a single repository URL to check. The URL must begin with <code>https://</code>. <strong>Example</strong>: <code>--repository https://github.com/example/repo</code></p>
+</li>
+<li>
+<p><code>-rf, --repositories-file [FILEPATH]</code> - Provide a file path containing a list of repositories, each on a new line. The file must exist. <strong>Example</strong>: <code>--repositories-file ./list_of_repos.txt</code></p>
+</li>
+<li>
+<p><code>-o, --organization [URL]</code> - Specify an organization URL to check all repositories under that organization. The URL must begin with <code>https://</code>. <strong>Example</strong>: <code>--organization https://github.com/exampleOrg</code></p>
+</li>
+</ul>
+<h3 id="optional-arguments">Optional Arguments<a class="headerlink" href="#optional-arguments" title="Permanent link"></a></h3>
+<p>You'll find these optional but very handy in common gitxray usage.</p>
+<ul>
+<li>
+<p><code>-l, --list</code> - List contributors if a repository is specified or list repositories if an organization is specified. Useful for further focusing on specific entities. <strong>Example</strong>: <code>--list</code></p>
+</li>
+<li>
+<p><code>-c, --contributor [USERNAMES]</code> - A comma-separated list of GitHub usernames to focus on within the specified repository or organization. <strong>Example</strong>: <code>--contributor user1,user2</code></p>
+</li>
+<li>
+<p><code>-f, --filters [KEYWORDS]</code> - Comma-separated keywords to filter the results by, such as 'user_input', 'association', or 'mac'. <strong>Example</strong>: <code>--filters user_input,association,mac</code></p>
+</li>
+</ul>
+<h4 id="output-and-formats">Output and Formats<a class="headerlink" href="#output-and-formats" title="Permanent link"></a></h4>
+<ul>
+<li>
+<p><code>-out, --outfile [FILEPATH]</code> - Specify the file path for the output log. Cannot be a directory. <strong>Example</strong>: <code>--outfile ./output.log</code></p>
+</li>
+<li>
+<p><code>-outformat, --output-format [FORMAT]</code> - Set the format for the log file. Supported formats are <code>html</code>, <code>text</code> and <code>json</code>. Default is <code>html</code>. <strong>Example</strong>: <code>--output-format json</code></p>
+</li>
+</ul>
+<h4 id="debug">Debug<a class="headerlink" href="#debug" title="Permanent link"></a></h4>
+<ul>
+<li><code>--debug</code> - Enable Debug mode for a detailed and extensive output. <strong>Example</strong>: <code>--debug</code></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../features/" class="btn btn-neutral float-right" title="Features &#128171;">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Made with &hearts; by <a href="https://www.kulkan.com" target="_blank">Kulkan Security</a> - your favorite <a href="https://www.kulkan.com" target="_blank">Penetration Testing Partner</a>.
+</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/kulkansecurity/gitxray" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="../features/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
