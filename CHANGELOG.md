@@ -1,5 +1,12 @@
 # Changelog
 
+## Release v1.0.18 (August 20th, 2025)
+* New 'host_refs' section/feature! Uses the GitHub Code search API to search for http(s) hosts (domains or IP addresses). It also searches inside Workflows. It can definitely help at the time of mapping infrastructure of a target, or for checking your own repositories for potential malicious activity. Only works if a GH_ACCESS_TOKEN is set, due to Code search API restrictions.
+* New integration with the VirusTotal API, which can be activated by setting VT_API_KEY to your VirusTotal API Key! It will populate results in a new 'host_refs_vt' section for any hosts that were previously identified in host_refs.
+* Merged the 'urls' section for contributors and repository with 'profiling' - only kept it for non-contributors.
+* Fixed the sidebar menu in the HTML report so that the first click collapses a collapsable item directly; and also fixed indentation for subitems.
+* Added an inline description to categories in the HTML report explaining why and how the data of the category can be useful.
+
 ## Release v1.0.17.4 (April 27th, 2025)
 * Removed external links to Bootstrap CSS, JavaScript, and the Gitxray logo; now all assets (styles, scripts, images) are embedded so HTML reports are fully self-contained.
 * Merged a PR by satoridev01 which prevents Gitxray from printing stars, watchers, created, updated, contributors and anonymous if they were not found, as opposed to stating "0".
