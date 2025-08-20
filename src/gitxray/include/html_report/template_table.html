@@ -1,12 +1,13 @@
     <div class="table-section py-3">
         <div class="d-flex justify-content-between align-items-center">
        	<a id="{{table_id}}"></a>
-        <h3 class="flex-grow-1 text-start">{{table_title}}</h3>
+	<h3 class="flex-grow-1 text-start">{{table_title}}</h3>
           	<button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#tableCollapse_{{table_id}}" aria-expanded="true" aria-controls="tableCollapse_{{table_id}}">
 	            <span class="toggle-icon">&#8661;</span>
           	</button>
         </div>
 	<div class="collapse show" id="tableCollapse_{{table_id}}">
+	<h6><i>{{table_description}}</i></h6>
         <table class="table table-striped table-bordered" style="width:100%">
             <thead>
                 <tr>

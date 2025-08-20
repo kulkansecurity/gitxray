@@ -195,10 +195,10 @@ class Output:
 
                 if len(data_rows) > 0:
                     r_sidebar_links.append('<li class="nav-item"><a class="nav-link" href="#repository_'+str(sanitized_entity)+'_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li>')
-                    r_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "repository_"+str(sanitized_entity)+"_"+rtype))
+                    r_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "repository_"+str(sanitized_entity)+"_"+rtype).replace("{{table_description}}", f"{gx_definitions.HTML_REPORT_DESCRIPTIONS.get(rtype,'')}"))
 
             if len(r_tables) > 0:
-                repository_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity_raw)+' &#128193;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                repository_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity_raw)+' &#128193;</a><div class="px-3 collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
                 repository_sidebar_links += "".join(r_sidebar_links)
                 repository_sidebar_links += '</ul></div></li></ul>'
                 r_template = r_template.replace("{{repository_tables}}", "".join(r_tables))
@@ -230,7 +230,8 @@ class Output:
             category_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a href="#nav_category_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li></ul>'
             table_html = templates['table'].replace("{{table_rows}}", table_rows) \
                                        .replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype, '')}") \
-                                       .replace("{{table_id}}", f"nav_category_{rtype}")
+                                       .replace("{{table_id}}", f"nav_category_{rtype}") \
+                                       .replace("{{table_description}}", f"{gx_definitions.HTML_REPORT_DESCRIPTIONS.get(rtype,'')}")
             category_sections += table_html
 
 
@@ -255,10 +256,10 @@ class Output:
 
                 if len(data_rows) > 0:
                     c_sidebar_links.append('<li class="nav-item"><a class="nav-link" href="#contributor_'+str(sanitized_entity)+'_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li>')
-                    c_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "contributor_"+str(sanitized_entity)+"_"+str(rtype)))
+                    c_tables.append(templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype,'')}").replace("{{table_id}}", "contributor_"+str(sanitized_entity)+"_"+str(rtype)).replace("{{table_description}}", f"{gx_definitions.HTML_REPORT_DESCRIPTIONS.get(rtype,'')}"))
 
             if len(c_tables) > 0:
-                contributor_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128193;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                contributor_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128193;</a><div class="px-3 collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
                 contributor_sidebar_links += "".join(c_sidebar_links)
                 contributor_sidebar_links += '</ul></div></li></ul>'
                 c_template = c_template.replace("{{contributor_tables}}", "".join(c_tables))
@@ -269,7 +270,7 @@ class Output:
                 sanitized_entity = "Anonymous"
                 a_template = templates['non_contributor'].replace("{{non_contributor_id}}", str(sanitized_entity))
                 a_template = a_template.replace("{{non_contributor_name}}", f'{sanitized_entity} &#128123;')
-                more_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128123;</a><div class="collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
+                more_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav_'+str(sanitized_entity)+'" href="#nav_'+str(sanitized_entity)+'">'+str(sanitized_entity)+' &#128123;</a><div class="px-3 collapse" id="nav_'+str(sanitized_entity)+'"><ul class="nav flex-column ms-3">'
                 a_tables = ""
                 for rtype in data.keys():
                     data_rows = []
@@ -281,7 +282,7 @@ class Output:
                     if len(data_rows) > 0:
                         more_sidebar_links += '<li class="nav-item"><a class="nav-link" href="#contributor_'+str(sanitized_entity)+'_'+str(rtype)+'">'+str(rtype)+'</a></li>'
 
-                    a_tables += templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", str(rtype)).replace("{{table_id}}", "contributor_"+str(sanitized_entity)+"_"+str(rtype))
+                    a_tables += templates['table'].replace("{{table_rows}}", "".join(data_rows)).replace("{{table_title}}", str(rtype)).replace("{{table_id}}", "contributor_"+str(sanitized_entity)+"_"+str(rtype)).replace("{{table_description}}", f"{gx_definitions.HTML_REPORT_DESCRIPTIONS.get(rtype,'')}")
 
                 more_sidebar_links += '</ul></div></li></ul>'
                 a_template = a_template.replace("{{non_contributor_tables}}", a_tables)
@@ -312,13 +313,14 @@ class Output:
             more_sidebar_links += '<ul class="nav flex-column mb-0"><li class="nav-item"><a href="#nav_more_'+str(rtype)+'">'+str(rtype)+' '+gx_definitions.HTML_REPORT_EMOJIS.get(rtype,"")+'</a></li></ul>'
             table_html = templates['table'].replace("{{table_rows}}", table_rows) \
                                        .replace("{{table_title}}", f"{rtype} {gx_definitions.HTML_REPORT_EMOJIS.get(rtype, '')}") \
-                                       .replace("{{table_id}}", f"nav_more_{rtype}")
+                                       .replace("{{table_id}}", f"nav_more_{rtype}") \
+                                       .replace("{{table_description}}", f"{gx_definitions.HTML_REPORT_DESCRIPTIONS.get(rtype,'')}")
             more_sections += table_html
 
 
         # We now have all highlights under highlights_rows; let's fill the highlights table and section of the report
         if len(highlights_rows) > 0:
-            highlights_section = templates['table'].replace("{{table_rows}}", "".join(highlights_rows)).replace("{{table_title}}", "Highlights").replace("{{table_id}}", "highlights")
+            highlights_section = templates['table'].replace("{{table_rows}}", "".join(highlights_rows)).replace("{{table_title}}", "Highlights").replace("{{table_id}}", "highlights").replace("{{table_description}}", "")
         else: highlights_section = "<br/><h5>No results were highlighted by Gitxray.</h5>"
 
         output = templates['main'].replace("{{repository_sections}}", repository_sections)
