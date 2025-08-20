@@ -69,8 +69,8 @@ def run(gx_context, gx_output, gh_api):
         gx_output.c_log(f"X-Ray on contributor started at {c_started_at}", contributor=contributor_login, rtype="metrics")
 
         gx_output.stdout(f"\r[{c_users_index}/{len(c_users)}] Analyzing Profile data for {contributor.get('login')}"+' '*40, end = '', flush=True)
-        gx_output.c_log(f"Contributor URL: {contributor.get('html_url')}", rtype="urls")
-        gx_output.c_log(f"Owned repositories: https://github.com/{contributor_login}?tab=repositories", rtype="urls")
+        gx_output.c_log(f"Contributor URL: {contributor.get('html_url')}", rtype="profiling")
+        gx_output.c_log(f"Owned repositories: https://github.com/{contributor_login}?tab=repositories", rtype="profiling")
 
         if contributor.get('name') != None:
             gx_output.c_log(f"[Name: {contributor.get('name')}] obtained from the user's profile.", rtype="personal")
