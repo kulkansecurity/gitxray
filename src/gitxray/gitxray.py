@@ -20,7 +20,7 @@ def gitxray_cli():
 ░░██████                                                  ░░██████  
  ░░░░░░                                                    ░░░░░░   
 gitxray: X-Ray and analyze GitHub Repositories and their Contributors. Trust no one!
-v1.0.17.4 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
+v1.0.18 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing by creative minds.
 """+"#"*gx_definitions.SCREEN_SEPARATOR_LENGTH)
 
     # Let's initialize a Gitxray context, which parses arguments and more.
@@ -39,6 +39,10 @@ v1.0.17.4 - Developed by Kulkan Security [www.kulkan.com] - Penetration testing 
         gx_output.warn("Without setting a GitHub token you may only be able to scan small repositories uninterruptedly.")
     else:
         gx_output.notify(f"GitHub Token loaded from {gx_definitions.ENV_GITHUB_TOKEN} env variable.")
+        if not gx_context.usingVT():
+            gx_output.warn(f"{gx_definitions.ENV_VT_API_KEY} environment variable not set, VirusTotal integration disabled.")
+        else:
+            gx_output.notify(f"VirusTotal API Key loaded from {gx_definitions.ENV_VT_API_KEY} env variable.")
 
     gx_output.notify(f"Output format set to [{gx_context.getOutputFormat().upper()}] - You may change it with -outformat.")
 
