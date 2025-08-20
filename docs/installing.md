@@ -44,6 +44,19 @@ read -rs GH_ACCESS_TOKEN
 export
 ```
 
+## Integration with VirusTotal
+
+Gitxray can optionally use the VirusTotal API to check any hosts identified with GitHub's Code search API, but it requires a VirusTotal API Key to work. Instructions on how to get your VirusTotal API Key are available at: https://docs.virustotal.com/docs/please-give-me-an-api-key
+
+Unfortunately, personal API Keys are (as of today) limited by VirusTotal to 500 lookups a day.
+
+Once you have the API key, you may safely load it in your environment with:
+
+```bash
+read -rs VT_API_KEY
+export
+```
+
 ## Command Line Arguments
 
 ### Required Arguments
