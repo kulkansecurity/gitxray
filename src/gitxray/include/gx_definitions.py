@@ -1,5 +1,7 @@
 # Name of the Environment variable to use for GitHub Tokens
 ENV_GITHUB_TOKEN = "GH_ACCESS_TOKEN"
+# Name of the Environment variable to use for VirusTotal API Key
+ENV_VT_API_KEY = "VT_API_KEY"
 
 # GitHub has historically signed commits made via its web editor with a Key that expired in 2024
 # The latest Key however has no expiration set. The "web-flow" GitHub account owns these keys:
@@ -19,6 +21,8 @@ COMMIT_HOURS = {i: f"{i%12 if i%12 else 12}{'am' if i < 12 else 'pm'} UTC" for i
 # For the HTML output format
 HTML_REPORT_EMOJIS = {
     "metrics": "&#128200;",
+    "host_refs": "&#128225;",
+    "host_refs_vt": "&#128126;",
     "urls": "&#127760;",
     "personal": "&#127380;",
     "emails": "&#9993;",
@@ -40,6 +44,11 @@ HTML_REPORT_EMOJIS = {
     "signatures": "&#9997;",
     "association": "&#129309;",
     "prs": "&#128256;"
+}
+
+HTML_REPORT_DESCRIPTIONS = {
+    "host_refs":"Hosts were obtained by searching for http(s) keywords using <a href='https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#search-code' target='_new'>GitHub's Code Search API</a> which requires a valid <a href='https://gitxray.com/installing/#creating-an-access-token-to-increase-rate-limits' target='_new'>GitHub API Token</a> to work - Note that GitHub only scans the default branch, and any dynamically constructed resources, or connections over other protocols would not be picked up and therefore not listed below.",
+    "host_refs_vt":"Only hosts from the host_refs section are scanned using VirusTotal (requires a VT API Key) and displayed here."
 }
 
 # Identifies user-supplied data as per: https://securitylab.github.com/resources/github-actions-untrusted-input/
@@ -102,3 +111,4 @@ OPENPGP_HASH_ALGOS = {
     11: "SHA224"
 }
 
+REGEX_HOST_ANALYSIS = r'(?:https?|ftps?|s3)://([\w.-]+)'

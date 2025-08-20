@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from collections import defaultdict
 import math
 from gitxray.include import gh_time, gh_public_events, gh_reactions
+from gitxray.include.vt_api import VTRESTAPI
 
 def run(gx_context, gx_output, gh_api):
     gx_output.stdout("Running verifications on the repository..")
@@ -35,10 +36,10 @@ def run(gx_context, gx_output, gh_api):
         gx_output.r_log(f"Repository owner account is [{repository.get('owner').get('login')}]: {repository.get('owner').get('html_url')}", rtype="profiling")
 
     if repository.get('html_url'):
-        gx_output.r_log(f"Repository Url: [{repository.get('html_url')}]", rtype="urls")
+        gx_output.r_log(f"Repository Url: [{repository.get('html_url')}]", rtype="profiling")
 
     if repository.get('homepage'):
-        gx_output.r_log(f"Homepage: [{repository.get('homepage')}]", rtype="urls")
+        gx_output.r_log(f"Homepage: [{repository.get('homepage')}]", rtype="profiling")
 
     # These go in the repository xray and not contributors because the REST API returns all per repository
     # https://api.github.com/repos/infobyte/faraday/issues/comments - and won't allow filtering in a helpful (to us) way
@@ -483,6 +484,38 @@ def run(gx_context, gx_output, gh_api):
     for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS").items():
             gx_output.r_log(f"WARNING: UNRELIABLE DATES (Older than Account) in {dates_mismatch_commits} commits by [{user}]. Potential tampering, account re-use, or Rebase.", rtype="commits")
        
+
+    # Get any Hosts and analyze them
+    if gx_context.usingToken():
+        gx_output.stdout(f'\rUsing the code search API to discover hosts..' + " "*30, end="")
+        hosts = gh_api.fetch_hosts_from_code(repository)
+        if gx_context.usingVT():
+            gx_output.stdout(f'\rAnalyzing with VirusTotal {len(hosts)} hosts obtained from the Code search API' + " "*30, end="")
+
+        for host in hosts:
+            code_url = f'https://github.com/search?q=repo%3A{repository.get("full_name")}%20{host}&type=code'
+            host_str = f'"{host}" - {code_url}'
+            gx_output.r_log(f"{host_str} ", rtype="host_refs")
+            vt_api = VTRESTAPI(gx_output)
+            vt_response = vt_api.host_report(host, gx_context.debugEnabled())
+            if not vt_response:
+                gx_output.r_log(f"{host} skipped from VirusTotal check.", rtype="host_refs_vt")
+                continue
+
+            gx_output.stdout(f'\rQuerying VirusTotal for: {host}' + ' '*50, end="")
+            vt_response = vt_response["data"]["attributes"]["last_analysis_stats"]
+            total_votes = sum(vt_response.values())
+            total_malicious = int(vt_response.get("malicious", 0))
+            total_suspicious = int(vt_response.get("suspicious", 0))
+
+            vt_url = f"https://www.virustotal.com/gui/domain/{host}"
+            if total_malicious >= 5 or (total_votes > 0 and total_malicious / total_votes > 0.2):
+                gx_output.r_log(f"WARNING: \"{host}\" flagged by multiple vendors as malicious ({total_malicious}/{total_votes}): {vt_url} - link to code: {code_url}", rtype="host_refs_vt")
+            elif total_malicious > 0 or total_suspicious > 2:
+                gx_output.r_log(f"\"{host}\" only flagged by a few vendors ({total_malicious} malicious, {total_suspicious} suspicious out of {total_votes}): {vt_url} - link to code: {code_url}", rtype="host_refs_vt")
+            else:
+                gx_output.r_log(f"\"{host}\" not considered suspicious or malicious by VirusTotal: {vt_url}", rtype="host_refs_vt")
+
 
     """ This here next is Work in Progress - trying to figure out what to pay attention to here that makes sense.
     # Get all Issues. Note from GitHub that Issues returns both Issues + PRs:

@@ -6,6 +6,7 @@ class Context:
     def __init__(self):
         self._cmd_args = gx_arg_parser.parse_arguments()
         self._USING_TOKEN = os.environ.get(gx_definitions.ENV_GITHUB_TOKEN, None)
+        self._VT_API_KEY = os.environ.get("VT_API_KEY", None)
         self.reset()
 
     def reset(self):
@@ -14,6 +15,9 @@ class Context:
 
     def usingToken(self):
         return self._USING_TOKEN != None
+
+    def usingVT(self):
+        return self._VT_API_KEY != None
 
     def debugEnabled(self):
         return self._cmd_args.debug

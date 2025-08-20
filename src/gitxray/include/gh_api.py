@@ -1,4 +1,5 @@
 import os, requests, base64, re, time, urllib
+from . import gx_definitions
 
 class GitHubRESTAPI:
     def __init__(self, gx_output):
@@ -47,9 +48,10 @@ class GitHubRESTAPI:
         else:
             return "" 
 
-    def github_request_json(self, url, params=None, limit_results=None):
+    def github_request_json(self, url, params=None, extra_headers=None, limit_results=None):
         # https://docs.github.com/en/rest/about-the-rest-api/api-versions?apiVersion=2022-11-28
-        headers = {"X-GitHub-Api-Version":"2022-11-28"}
+        headers = {**(extra_headers or {}), "X-GitHub-Api-Version": "2022-11-28"}
+
         if self.GITHUB_TOKEN:
             headers["Authorization"] = f"token {self.GITHUB_TOKEN}"
 
@@ -107,6 +109,7 @@ class GitHubRESTAPI:
                 pages_fetched += 1
                 if total_pages is None:
                     total_pages = self.get_total_pages_from_link_header(links)
+                    #print(f'Total pages is: {total_pages}')
 
                 # Print progress if total pages is known
                 if total_pages:
@@ -130,6 +133,7 @@ class GitHubRESTAPI:
                         for link in links.split(','):
                             if 'rel="next"' in link:
                                 next_url = link.split(';')[0].strip('<> ')
+                                #print(f'next_url is: {next_url}')
                                 break
 
             except KeyboardInterrupt:
@@ -140,15 +144,23 @@ class GitHubRESTAPI:
         return all_results
 
 
-    def fetch_domains_from_code(self, repository):
-        matches = self.github_request_json(f"{self.GITHUB_API_BASE_URL}/search/code?q=repo:{repository}%20in:file%20http")
-        for m in matches['items']:
-            code = base64.b64decode(self.github_request_json(m['url'])["content"]).decode()
-            # This by no means is a complete regex - do not rely on this code picking up ALL possible domains
-            url_pattern = r'https?://([\w.-]+)'
-            # Find all matches in the code content
-            matches = re.findall(url_pattern, code)
-            return matches
+    def fetch_hosts_from_code(self, repo):
+        if self.GITHUB_TOKEN is None: return set() # Can't use this API while unauthenticated
+        resp = self.github_request_json(f"{self.GITHUB_API_BASE_URL}/search/code", \
+                params={"q": f"repo:{repo.get('full_name')} in:file http"}, \
+                # setting extra_headers here to get matched fragments in this response directly
+                # based on this: https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#text-match-metadata
+                extra_headers={'Accept':'application/vnd.github.text-match+json'})
+        items = resp.get('items', [])
+        hosts = set()
+        for item in items:
+            text_matches = item.get("text_matches", [])
+            for match in text_matches:
+                fragment = match.get("fragment", "").lower()
+                found = re.findall(gx_definitions.REGEX_HOST_ANALYSIS, fragment)
+                hosts.update(found)
+        
+        return hosts
 
     def fetch_repository(self, github_url):
         # Extract owner and repository name from the GitHub URL
@@ -161,6 +173,11 @@ class GitHubRESTAPI:
         # Extract the Org from the URL
         org = org_url.strip('/').split('/')[-1]
         return self.github_request_json(f"{self.GITHUB_API_BASE_URL}/orgs/{org}/repos")
+
+    def fetch_members_for_org(self, org_url):
+        # Extract the Org from the URL
+        org = org_url.strip('/').split('/')[-1]
+        return self.github_request_json(f"{self.GITHUB_API_BASE_URL}/orgs/{org}/members")
 
     def fetch_repository_file_contents(self, repository, path):
         return self.github_request_json(f"{self.GITHUB_API_BASE_URL}/repos/{repository.get('full_name')}/contents/{path}")
