@@ -87,7 +87,9 @@ def log_events(events, gx_output, for_repository=False):
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#pushevent
         elif etype == "PushEvent":
-            logging_func(f"{ts}: {actor}pushed a total of {len(payload.get('commits'))} commits from: [{payload.get('ref')}]", rtype="90d_events")
+            commits = payload.get('commits')
+            if commits is None: commits = []
+            logging_func(f"{ts}: {actor}pushed a total of {len(commits)} commits from: [{payload.get('ref')}]", rtype="90d_events")
 
         # https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#releaseevent
         elif etype == "ReleaseEvent":
