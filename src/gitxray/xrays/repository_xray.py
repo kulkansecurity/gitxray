@@ -481,9 +481,10 @@ def run(gx_context, gx_output, gh_api):
                 gx_output.c_log(f"The user submitted {details['submitted']} Pull Requests out of which {details['open']} remain open.", rtype="profiling", contributor=user)
 
     # Check if there were any users with mismatches in commits dates in the repository.
-    for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS").items():
-            gx_output.r_log(f"WARNING: UNRELIABLE DATES (Older than Account) in {dates_mismatch_commits} commits by [{user}]. Potential tampering, account re-use, or Rebase.", rtype="commits")
-       
+    for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS_ACCOUNT").items():
+            gx_output.r_log(f"UNRELIABLE COMMIT DATES in {dates_mismatch_commits} commits by [{user}]. They are dated earlier than the account creation time. Potential tampering, account re-use, or Rebase.", rtype="commits")
+    for user, dates_mismatch_commits in gx_context.getIdentifierValues("DATE_MISMATCH_COMMITS_REPOSITORY").items():
+            gx_output.r_log(f"UNRELIABLE COMMIT DATES in {dates_mismatch_commits} commits by [{user}]. They are dated earlier than the repository creation time. Potential tampering, account re-use, or Rebase.", rtype="commits")
 
     # Get any Hosts and analyze them
     if gx_context.usingToken():

@@ -40,6 +40,9 @@ def run(gx_context, gx_output, gh_api):
         gx_output.stdout(f"IMPORTANT: The repository has 500+ contributors. GitHub states > 500 contributors will appear as Anonymous")
         gx_output.stdout(f"More information at: https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-contributors")
 
+    # We will use this created_at_time for the repository in one or two loops before.
+    repository_created_at_time = gh_time.parse_date(repository.get('created_at'))
+
     for i, c in enumerate(gx_context.getContributors()):
         if contributor_scope != None and c.get('login') not in contributor_scope: continue
         gx_output.stdout('\rFetching repository contributor details [{}/{}]'.format(i+1, c_len), end='', flush=True)
@@ -116,17 +119,24 @@ def run(gx_context, gx_output, gh_api):
             gx_output.c_log(f"The account may be an administrator. It has 'site_admin' set to True", rtype="profiling")
 
         commits = gh_api.fetch_commits(repository, author=contributor.get('login'))
-        if commits != None and len(commits) > 0:
-            commits_message = f", at {commits[0]['commit']['author']['date']}."
-            oldest_commit = commits[-1]['commit']['author']['date']
-            if len(commits) > 1:
-                commits_message = f", first one at {oldest_commit} and last one at {commits[0]['commit']['author']['date']}."
-            gx_output.c_log(f'Made (to this repo) {len(commits)} commits{commits_message}', rtype="commits")
+        # The REST API does not always work reliable when filtering commits by author. 
+        # We create a username@users.noreply.github.com as an alternative author.
+        if commits != None:
+            if len(commits) == 0:
+                commits = gh_api.fetch_commits(repository, author=contributor.get('login')+"@users.noreply.github.com")
+
+            if len(commits) > 0:
+                commits_message = f", at {commits[0]['commit']['author']['date']}."
+                oldest_commit = commits[-1]['commit']['author']['date']
+                if len(commits) > 1:
+                    commits_message = f", first one at {oldest_commit} and last one at {commits[0]['commit']['author']['date']}."
+                gx_output.c_log(f'Made (to this repo) {len(commits)} commits{commits_message}', rtype="commits")
 
         signed_commits = []
         failed_verifications = []
         signature_attributes = []
-        dates_mismatch_commits = []
+        dates_mismatch_commits_account = []
+        dates_mismatch_commits_repository  = []
         commit_times = defaultdict(int)
         gx_output.stdout(f"\r[{c_users_index}/{len(c_users)}] Analyzing {len(commits)} commits and any signing keys for {contributor.get('login')}"+' '*40, end = '', flush=True)
         for commit in commits:
@@ -174,15 +184,22 @@ def run(gx_context, gx_output, gh_api):
 
             commit_date = gh_time.parse_date(c['author']['date'])
             if commit_date < contributor_created_at_time:
-                dates_mismatch_commits.append(c)
+                dates_mismatch_commits_account.append(c)
+
+            if commit_date < repository_created_at_time:
+                dates_mismatch_commits_repository.append(c)
 
             # Let's group by commit hour, we may have an insight here.
             commit_times[commit_date.hour] += 1
 
-        if len(dates_mismatch_commits) > 0:
-            gx_output.c_log(f"WARNING: UNRELIABLE DATES (Older than Account) in {len(dates_mismatch_commits)} commits by [{contributor_login}]. Potential tampering, account re-use, or Rebase. List at: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
+        if len(dates_mismatch_commits_account) > 0:
+            gx_output.c_log(f"WARNING: UNRELIABLE COMMIT DATES (Older than Account, which was created on {contributor.get('created_at')}) in {len(dates_mismatch_commits_account)} commits by [{contributor_login}]. Potential tampering, account re-use, or Rebase. List at: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
             gx_output.c_log(f"View commits with unreliable DATES here: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
-            gx_context.linkIdentifier("DATE_MISMATCH_COMMITS", [len(dates_mismatch_commits)], contributor_login)
+            gx_context.linkIdentifier("DATE_MISMATCH_COMMITS_ACCOUNT", [len(dates_mismatch_commits_account)], contributor_login)
+
+        if len(dates_mismatch_commits_repository) > 0:
+            gx_output.c_log(f"WARNING: UNRELIABLE COMMIT DATES (Older than Repository, which was created on {repository.get('created_at')}) in {len(dates_mismatch_commits_repository)} commits by [{contributor_login}]. Potential tampering, account re-use, or Rebase. List at: {repository.get('html_url')}/commits/?author={contributor_login}&until={contributor.get('created_at')}", rtype="commits")
+            gx_context.linkIdentifier("DATE_MISMATCH_COMMITS_REPOSITORY", [len(dates_mismatch_commits_repository)], contributor_login)
 
         if len(commit_times) > 0:
             # Let's link these commit hours to this contributor, and we'll do extra analysis in the associations X-Ray
