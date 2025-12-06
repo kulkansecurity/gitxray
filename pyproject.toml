@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gitxray"
-version = "1.0.18"
+version = "1.0.19"
 authors = [
   { name="Lucas Lavarello", email="llavarello@kulkan.com" },
 ]
