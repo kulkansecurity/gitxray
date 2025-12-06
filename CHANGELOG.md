@@ -1,5 +1,10 @@
 # Changelog
 
+## Release v1.0.19 (December 6th, 2025)
+* Fix by @ThemeHackers merged; slight change to fix a TypeError in gh_public_events for missing commits.
+* Fix to missing commits when filtering by author for very specific cases. The GitHub REST API behaves strangely and sometimes filtering by author only works if its an email.
+* Added, in addition to the existing checks of Commit date vs. Account creation time, a check against the Repository creation time which also issues a highlighted WARNING.
+
 ## Release v1.0.18 (August 20th, 2025)
 * New 'host_refs' section/feature! Uses the GitHub Code search API to search for http(s) hosts (domains or IP addresses). It also searches inside Workflows. It can definitely help at the time of mapping infrastructure of a target, or for checking your own repositories for potential malicious activity. Only works if a GH_ACCESS_TOKEN is set, due to Code search API restrictions.
 * New integration with the VirusTotal API, which can be activated by setting VT_API_KEY to your VirusTotal API Key! It will populate results in a new 'host_refs_vt' section for any hosts that were previously identified in host_refs.
