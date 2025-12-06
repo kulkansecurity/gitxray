@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.gitxray.com/vulnerable_workflows/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Vulnerable Workflows - Gitxray</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Vulnerable Workflows";
+        var mkdocs_page_input_path = "vulnerable_workflows.md";
+        var mkdocs_page_url = "/vulnerable_workflows/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Gitxray
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installing/">Installing and Updating Gitxray</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../features/">Features &#128171;</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Vulnerable Workflows</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../code_structure/">Code structure</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../gitxray_buzz/">Gitxray Buzz</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Gitxray</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Vulnerable Workflows</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/kulkansecurity/gitxray/edit/master/docs/vulnerable_workflows.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="vulnerable-workflows">Vulnerable Workflows<a class="headerlink" href="#vulnerable-workflows" title="Permanent link"></a></h1>
+<p>You may have landed here because Git X-Ray suggested that you further inspect a specific Workflow in a repository that you were X-Raying, or because of some other reason.</p>
+<p>Either way, here's a list of specialized software and documentation on how to proceed with analyzing the security of your workflow.</p>
+<h1 id="tools-for-workflow-analysis">Tools for Workflow analysis<a class="headerlink" href="#tools-for-workflow-analysis" title="Permanent link"></a></h1>
+<ul>
+<li>
+<p><a href="https://github.com/synacktiv/octoscan">https://github.com/synacktiv/octoscan</a> - A SAST tool for GitHub Workflows.</p>
+</li>
+<li>
+<p><a href="https://github.com/AdnaneKhan/Gato-X">https://github.com/AdnaneKhan/Gato-X</a> - Excellent for identifying at scale vulnerable Workflows.</p>
+</li>
+<li>
+<p><a href="https://semgrep.dev/p/github-actions">https://semgrep.dev/p/github-actions</a> - Semgrep rules for GitHub Workflows.</p>
+</li>
+<li>
+<p><a href="https://github.com/tindersec/gh-workflow-auditor">https://github.com/tindersec/gh-workflow-auditor</a> - A script by Tinder Security which analyzes multiple aspects of a Workflow.</p>
+</li>
+</ul>
+<h1 id="articles-about-github-workflows-and-security">Articles about GitHub Workflows and Security<a class="headerlink" href="#articles-about-github-workflows-and-security" title="Permanent link"></a></h1>
+<h2 id="official-by-github">Official by GitHub<a class="headerlink" href="#official-by-github" title="Permanent link"></a></h2>
+<ul>
+<li><a href="https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/">https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/</a></li>
+<li><a href="https://securitylab.github.com/resources/github-actions-untrusted-input/">https://securitylab.github.com/resources/github-actions-untrusted-input/</a></li>
+<li><a href="https://securitylab.github.com/resources/github-actions-building-blocks/">https://securitylab.github.com/resources/github-actions-building-blocks/</a></li>
+<li><a href="https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions">https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions</a></li>
+</ul>
+<h2 id="by-independent-researchers-and-organizations">By independent researchers and organizations<a class="headerlink" href="#by-independent-researchers-and-organizations" title="Permanent link"></a></h2>
+<ul>
+<li>
+<p><a href="https://medium.com/tinder/exploiting-github-actions-on-open-source-projects-5d93936d189f">https://medium.com/tinder/exploiting-github-actions-on-open-source-projects-5d93936d189f</a></p>
+</li>
+<li>
+<p><a href="https://openssf.org/blog/2024/08/12/mitigating-attack-vectors-in-github-workflows/">OSSF: Mitigating Attack Vectors in GitHub Workflows</a></p>
+</li>
+</ul>
+<h1 id="videos">Videos<a class="headerlink" href="#videos" title="Permanent link"></a></h1>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=Ers-LcA7Nmc">https://www.youtube.com/watch?v=Ers-LcA7Nmc</a> - A great video and slides by Rob Bos on GitHub Actions with security in mind</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../features/" class="btn btn-neutral float-left" title="Features &#128171;"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../code_structure/" class="btn btn-neutral float-right" title="Code structure">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Made with &hearts; by <a href="https://www.kulkan.com" target="_blank">Kulkan Security</a> - your favorite <a href="https://www.kulkan.com" target="_blank">Penetration Testing Partner</a>.
+</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/kulkansecurity/gitxray" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../features/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../code_structure/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

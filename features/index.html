@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.gitxray.com/features/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Features &#128171; - Gitxray</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Features \u0026#128171;";
+        var mkdocs_page_input_path = "features.md";
+        var mkdocs_page_url = "/features/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Gitxray
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installing/">Installing and Updating Gitxray</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Features &#128171;</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#a-user-friendly-html-report">A user-friendly HTML report &#x1F4CA;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unintended-disclosures-in-contributor-profiles">Unintended disclosures in Contributor profiles &#128064;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#spotting-shared-co-owned-or-fake-contributors">Spotting shared, co-owned or fake Contributors &#128123;</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#important">Important</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#duplicate-repository-name-check">Duplicate Repository Name Check &#128737;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#forensics-what-happened-on-the-day-of-an-incident">Forensics: What happened on the day of an incident? &#128269;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#analyzing-commit-hours-to-identify-anomalies">Analyzing Commit Hours to Identify Anomalies &#128347;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#untrustworthy-repositories-and-activity">Untrustworthy Repositories and Activity &#127988;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#x-raying-github-workflows">X-Raying GitHub Workflows &#9881;</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#disclaimer-gitxray-is-not-a-complete-workflow-security-scanner">Disclaimer: Gitxray is NOT a complete Workflow Security Scanner</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#the-pr-rejection-awards">The PR Rejection Awards &#127942;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#fake-starring-private-repos-gone-public-and-more">Fake Starring, Private repos gone Public and more &#128584;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#lots-of-e-mail-addresses-and-profiling-data">Lots of e-mail addresses &#128231; and Profiling data &#128100;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#looking-out-for-malicious-releases-and-assets">Looking out for malicious Releases and Assets &#128065;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#anonymous-contributors">Anonymous contributors &#128065;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#and-so-much-more">And so much more.</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../vulnerable_workflows/">Vulnerable Workflows</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../code_structure/">Code structure</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../gitxray_buzz/">Gitxray Buzz</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Gitxray</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Features &#128171;</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/kulkansecurity/gitxray/edit/master/docs/features.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="features">Features &#128171;<a class="headerlink" href="#features" title="Permanent link"></a></h1>
+<p>Because of the amount of data it analyzes, <code>gitxray</code> can be a bit overwhelming at first. Let's look at a few examples of potential awesome findings which can better explain why you're here and why <code>gitxray</code> is awesome &hearts;. </p>
+<h2 id="a-user-friendly-html-report">A user-friendly HTML report &#x1F4CA;<a class="headerlink" href="#a-user-friendly-html-report" title="Permanent link"></a></h2>
+<p><code>gitxray</code> now offers a default output format of <code>html</code>, creating a <a href="https://www.getbootstrap.com">Bootstrap</a>-backed HTML report which offers easy navigation through Repository, Contributor and non-Contributor results.<div style="clear: both;"></div> <img alt="Gitxray HTML Report" src="../images/html_report_gitxray.png" title="HTML Report Gitxray" /><div style="clear: both;"></div></p>
+<h2 id="unintended-disclosures-in-contributor-profiles">Unintended disclosures in Contributor profiles &#128064;<a class="headerlink" href="#unintended-disclosures-in-contributor-profiles" title="Permanent link"></a></h2>
+<p><code>gitxray</code> reports under a <code>user_input</code> category any user-supplied data that repository Contributors may have exposed via their GitHub accounts inadevertently. This is normally the case of PGP and SSH key name fields, which unfortunately are used by Users to record hostnames, computer models, password locations (e.g. in 1Password), or even the <em>password itself</em> to a given key (which we all know might be the same password used elsewhere). To make things more interesting, <code>gitxray</code> also identifies any "excess" data found before, or after, PGP Armored keys published in a User's GitHub account. Wondering what that data normally is? Erroneous copy/pastes from the command line while exporting in ASCII/Armored format their keys. And what might that contain? Most of the times, a shell prompt revealing a local username, a hostname and a directory path. May I remind you all of this data is Public-facing.</p>
+<p>You may focus specifically on these types of findings by filtering results with:</p>
+<pre><code class="language-py">gitxray -o https://github.com/SampleOrg -f user_input
+</code></pre>
+<p>or, for a specific repository:</p>
+<pre><code class="language-py">gitxray -r https://github.com/SampleOrg/SampleRepo -f user_input
+</code></pre>
+<h2 id="spotting-shared-co-owned-or-fake-contributors">Spotting shared, co-owned or fake Contributors &#128123;<a class="headerlink" href="#spotting-shared-co-owned-or-fake-contributors" title="Permanent link"></a></h2>
+<p>Open source projects are under attack, with malicious actors hiding in plain sight. GitHub has <a href="https://github.blog/security/vulnerability-research/security-alert-social-engineering-campaign-targets-technology-industry-employees/">released a Security alert</a> describing one of potentially many modus-operandi adopted by Threat actors. So why not panic (a bit) and see if there's anything you could do to help protect the repositories you care about?</p>
+<p><code>gitxray</code> reports under the <code>association</code> category information that could help identify cases of suspicious activity or identity. By fingerprinting Keys added to a profile, as well as those historically used to sign a commit, and by looking at, for example, key and account creation times, it becomes possible to cross-reference the data and link <em>(hence 'association')</em> the behavior to 2 or more accounts.</p>
+<p>You can focus specifically on association findings by filtering for <code>association</code> with:</p>
+<pre><code>gitxray -o https://github.com/SampleOrg -f association 
+</code></pre>
+<p>or targetting a specific Repository with:</p>
+<pre><code>gitxray -r https://github.com/SampleOrg/SampleRepo -f association
+</code></pre>
+<h3 id="important">Important<a class="headerlink" href="#important" title="Permanent link"></a></h3>
+<p>Associations MUST NOT be directly and blindly used to report fake or shadow accounts. They are automatic observations from a piece of well-intended code. Do NOT treat association results as findings directly. We must protect open-source projects by first and foremost respecting open-source developers. Ensure that any actions taken are thoughtful and based on solid evidence, not just automated associations. </p>
+<h2 id="duplicate-repository-name-check">Duplicate Repository Name Check &#128737;<a class="headerlink" href="#duplicate-repository-name-check" title="Permanent link"></a></h2>
+<p><code>gitxray</code> will always check and detect duplicate repository names across different organizations and user profiles. This helps identify potential cloned or fake repositories. <code>gitxray</code> compares your target repository against others with the same name and the highest star count, ensuring you are engaging with the most popular (and likely legitimate) one.</p>
+<h2 id="forensics-what-happened-on-the-day-of-an-incident">Forensics: What happened on the day of an incident? &#128269;<a class="headerlink" href="#forensics-what-happened-on-the-day-of-an-incident" title="Permanent link"></a></h2>
+<p>Because <code>gitxray</code> collects data from multiple sources of activity including Commits, Comments, Workflow Runs, Issues, Deployments and more; and because <code>gitxray</code> shows activity in a standarized YYYY-MM-DD format, it becomes possible to use Filtering in order to place focus on specific activity happening at a specific point in time.</p>
+<p>For example, by running <code>gitxray</code> with the following arguments, only results from that specific date are returned. You may place focus on a day, or even a month:</p>
+<pre><code>gitxray -r https://github.com/SampleOrg/SampleRepo -f 2024-08 -outformat text
+gitxray -r https://github.com/SampleOrg/SampleRepo -f 2024-09-01 -outformat text
+</code></pre>
+<p>An outformat of type <code>text</code> can help in this specific use-case more than the defaul <code>html</code> report.</p>
+<h2 id="analyzing-commit-hours-to-identify-anomalies">Analyzing Commit Hours to Identify Anomalies &#128347;<a class="headerlink" href="#analyzing-commit-hours-to-identify-anomalies" title="Permanent link"></a></h2>
+<p><code>gitxray</code> provides a summary of contributor commit hours, allowing you to profile contributor activity and detect potential anomalies. This feature helps you understand typical patterns and flag unusual behavior for further investigation.</p>
+<h2 id="untrustworthy-repositories-and-activity">Untrustworthy Repositories and Activity &#127988;<a class="headerlink" href="#untrustworthy-repositories-and-activity" title="Permanent link"></a></h2>
+<p><code>gitxray</code> can be used to protect yourself, your team and your customers from fake Repositories and suspicious activity. For example, by analyzing commit dates and comparing them to the account creation timestamp of contributors, <code>gitxray</code> can flag inconsistencies that may indicate:</p>
+<ul>
+<li>
+<p>Tampered Commits: Some repositories may be manipulated to appear older than they actually are, such as claiming that all commits date back six years when the repository was only created a week ago. This tactic is often used to increase perceived value. Unfortunately, altering commit dates is relatively easy in Git, and GitHub is no exception. More on this <a href="https://www.reddit.com/r/git/comments/ympce5/is_it_possible_to_change_commit_date/">here</a>.</p>
+</li>
+<li>
+<p>Reclaimed Usernames: Trusted contributors might have had their accounts deleted and then re-registered by malicious actors. GitHub allows a username to be re-released after 90 days, making this a possible attack vector. Learn more about GitHub’s account deletion policy <a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-personal-account/deleting-your-personal-account#deleting-your-personal-account">here</a>.</p>
+</li>
+</ul>
+<p>It is possible to focus on unreliable historic activity by filtering for Warning keywords:</p>
+<pre><code>gitxray -o https://github.com/SampleOrg -f warning
+</code></pre>
+<h2 id="x-raying-github-workflows">X-Raying GitHub Workflows &#9881;<a class="headerlink" href="#x-raying-github-workflows" title="Permanent link"></a></h2>
+<p>The Workflows X-Ray module is executed upon identifying existing Workflows or Actions. <code>gitxray</code> provides in-depth analysis and monitoring of GitHub workflows, including:</p>
+<ul>
+<li>
+<p>Execution Analysis: Provides detailed insights into workflow execution, showing how many times each workflow was executed by contributors and non-contributors. This allows for better understanding of usage patterns and detection of unauthorized or unexpected activity.</p>
+</li>
+<li>
+<p>Detection of deleted runs: This feature helps identify whether workflow runs have been deleted, potentially indicating an attempt to erase traces of malicious activity or legitimate maintenance actions.</p>
+</li>
+<li>
+<p>Security Checks for Workflows: Performs a series of basic security checks on workflows to identify uses of Secrets, Self-hosted Runners and Potentially dangerous triggers (eg pull_request_target) that could pose a security risk.</p>
+</li>
+</ul>
+<h3 id="disclaimer-gitxray-is-not-a-complete-workflow-security-scanner">Disclaimer: Gitxray is NOT a complete Workflow Security Scanner<a class="headerlink" href="#disclaimer-gitxray-is-not-a-complete-workflow-security-scanner" title="Permanent link"></a></h3>
+<p>For more information on tools which are specialized in scanning Workflows refer to our <a href="../vulnerable_workflows/">Vulnerable Workflows section</a>.</p>
+<h2 id="the-pr-rejection-awards">The PR Rejection Awards &#127942;<a class="headerlink" href="#the-pr-rejection-awards" title="Permanent link"></a></h2>
+<p>Another <code>gitxray</code> feature is the ability to list a TOP 3 of GitHub accounts that have tried to submit Pull Requests to the repository, which ended up closed AND NOT merged. In certain emotional scenarios, this could be paraphrased as <em>rejected PRs</em>. Kidding aside, in some cases, this could lead to identifying Contributors who have repeatedly failed at merging a very evidently unaligned piece of code to a branch (I know, it sounds unlikely for an account to try and merge backdoor.py repeatedly... but is it?).</p>
+<p><code>gitxray</code> will show a TOP 3 list specific to Repository Contributors and a separate list for accounts which are NOT Contributors to the Repository.</p>
+<p>These findings, if any exist, are reported under a <code>contributors</code> category along with additional information related to other Repository Contributors. You can focus specifically on findings from the contributors category by filtering for <code>contributors</code> with:</p>
+<pre><code>gitxray -o https://github.com/SampleOrg -f contributors 
+</code></pre>
+<p>or targetting a specific Repository with:</p>
+<pre><code class="language-bash">gitxray -r https://github.com/SampleOrg/SampleRepo -f contributors
+</code></pre>
+<h2 id="fake-starring-private-repos-gone-public-and-more">Fake Starring, Private repos gone Public and more &#128584;<a class="headerlink" href="#fake-starring-private-repos-gone-public-and-more" title="Permanent link"></a></h2>
+<p>GitHub shares publicly <a href="https://docs.github.com/en/rest/activity/events?apiVersion=2022-11-28">up to 90 days of past Events</a> for any User account, which include actions such as Repository creation, Watching, Committing, Pull Requesting, and more. <code>gitxray</code> includes these events under a <code>90d_events</code> category in the results included for each Contributor.</p>
+<p>For example, Events you may come across that would be interesting include:</p>
+<ul>
+<li>
+<p>A user having very recently <em>switched a repository from PRIVATE to PUBLIC</em>. GitHub requires Users to tick several boxes prior to moving an existing private repository to public, lowering the chances of an unintended leak; however, a recent public repository may not have had as much attention and auditing as you would think.</p>
+</li>
+<li>
+<p>A user <a href="https://docs.github.com/en/rest/activity/starring?apiVersion=2022-11-28">starring</a> (originally known as <em>watching</em>) too many respositories too rapidly. This could be a tell of an account used for <a href="https://research.checkpoint.com/2024/stargazers-ghost-network/">Stargazing</a>. Or it could just be a normal human being in one of those days filled with anxiety.</p>
+</li>
+<li>
+<p>And more!</p>
+</li>
+</ul>
+<p>To find Contributors who recently switched from Private to Public a repository or who have Starred repositories, you may start with:</p>
+<pre><code>gitxray -o https://github.com/SampleOrg -f starred,private
+</code></pre>
+<p>And you could then target a specific Repository Contributor to get more information:</p>
+<pre><code>gitxray -r https://github.com/SampleOrg/SampleRepo -c some_user
+</code></pre>
+<h2 id="lots-of-e-mail-addresses-and-profiling-data">Lots of e-mail addresses &#128231; and Profiling data &#128100;<a class="headerlink" href="#lots-of-e-mail-addresses-and-profiling-data" title="Permanent link"></a></h2>
+<p><code>gitxray</code> will report for each Contributor, an <code>emails</code> category listing all unique e-mail address collected from parsing:</p>
+<ul>
+<li>The User's profile</li>
+<li>Each commit made by the User</li>
+<li>PGP Primary Keys and PGP SubKeys</li>
+</ul>
+<p>Additionally, Personal Information (e.g. social networks) voluntarily made Public by the User is extracted from multiple sources including PGP Key BLOBs and reported under a <code>personal</code> category.</p>
+<p>Finally, the <code>profiling</code> category tends to display information related to the account itself (e.g. creation date, last updated, and more.)</p>
+<p>You may focus specifically on <code>emails</code>, <code>personal</code>, and <code>profiling</code> fields with:</p>
+<pre><code class="language-py">gitxray -o https://github.com/SampleOrg -f emails,personal,profiling
+</code></pre>
+<p>or, for a specific repository, with: </p>
+<pre><code class="language-py">gitxray -r https://github.com/SampleOrg/SampleRepo -f emails,personal,profiling
+</code></pre>
+<h2 id="looking-out-for-malicious-releases-and-assets">Looking out for malicious Releases and Assets &#128065;<a class="headerlink" href="#looking-out-for-malicious-releases-and-assets" title="Permanent link"></a></h2>
+<p>It is possible for Threat Actors to compromise credentials of a Repository Maintainer in order to deploy malware by silently updating released Assets (the typical package you would download when a Release includes downloadable Assets); which is why <code>gitxray</code> looks at all Repository Releases and informs of:</p>
+<ul>
+<li>
+<p>Assets that were <strong>updated</strong> at least a day <strong>AFTER</strong> their release, which might lead to suggest they've been infected and/or tampered with. Or it could just be a maintainer fixing an asset without wanting to create a new release.</p>
+</li>
+<li>
+<p>Users who have historically created releases and/or uploaded assets, as well as the % vs. the total amount of releases or assets uploaded in the repository; which may allow you to flag potential suspicious activity. For example, you might notice an account which never created Releases before now uploading assets.</p>
+</li>
+</ul>
+<p>All of this information is included by <code>gitxray</code> in a <code>releases</code> category, which means you can focus on those results (if any exist) with:</p>
+<pre><code class="language-bash">gitxray -o https://github.com/SampleOrg -f releases
+</code></pre>
+<h2 id="anonymous-contributors">Anonymous contributors &#128065;<a class="headerlink" href="#anonymous-contributors" title="Permanent link"></a></h2>
+<p>As stated in <a href="https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-contributors">GitHub documentation</a>, only the first 500 author email addresses in a Repository will link to actual GitHub users or accounts. The rest will appear as "anonymous" contributors without associated GitHub information.</p>
+<p>Additionally, when an author's email address in a commit is not associated with a GitHub account, the User will also be considered Anonymous.</p>
+<p>Lucky for us, <code>gitxray</code> also includes within its output the entire list of Anonymous contributors received from GitHub. The list is first processed to combine all variations of Names used by the author for a same e-mail, which means the list can also be pretty useful when, for example, executing OSINT.</p>
+<p>To filter for anonymous contributors, you may use:</p>
+<pre><code class="language-bash">gitxray -o https://github.com/SampleOrg -f anonymous
+</code></pre>
+<h2 id="and-so-much-more">And so much more.<a class="headerlink" href="#and-so-much-more" title="Permanent link"></a></h2>
+<p>We've covered a large amount of use-cases for <code>gitxray</code>, yet we're nowhere finished. Start X-Raying today your favorite Organizations and Repositories and discover more ways of connecting dots. </p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../installing/" class="btn btn-neutral float-left" title="Installing and Updating Gitxray"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../vulnerable_workflows/" class="btn btn-neutral float-right" title="Vulnerable Workflows">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Made with &hearts; by <a href="https://www.kulkan.com" target="_blank">Kulkan Security</a> - your favorite <a href="https://www.kulkan.com" target="_blank">Penetration Testing Partner</a>.
+</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/kulkansecurity/gitxray" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../installing/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../vulnerable_workflows/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
